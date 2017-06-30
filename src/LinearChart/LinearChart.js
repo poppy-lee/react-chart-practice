@@ -4,7 +4,7 @@ import Immutable from "immutable"
 import PropTypes from "prop-types"
 import React from "react"
 
-class Chart extends React.Component {
+class LinearChart extends React.Component {
 
 	static propTypes = {
 		width: PropTypes.number.isRequired,
@@ -116,4 +116,4 @@ class Chart extends React.Component {
 
 }
 
-export default Chart
+export default LinearChart
