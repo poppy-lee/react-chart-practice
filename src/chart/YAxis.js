@@ -22,16 +22,16 @@ class YAxis extends React.Component {
 		return (
 			<g className="axis axis-y">
 				<line
-					stroke="#333"
+					stroke="#bbbbbb"
 					x1={Math.min(x1, x2)} y1={y1}
 					x2={Math.min(x1, x2)} y2={y2}
 				/>
 				{yTicks.map((y) => (
 					<g key={y}>
 						<line
-							stroke="#333"
+							stroke="#bbbbbb"
 							x1={Math.min(x1, x2) - 5} y1={yScale(y)}
-							x2={Math.min(x1, x2)} y2={yScale(y)}
+							x2={Math.max(x1, x2)} y2={yScale(y)}
 						/>
 						<text
 							x={Math.min(x1, x2) - 5}

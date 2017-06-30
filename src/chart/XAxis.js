@@ -22,14 +22,15 @@ class XAxis extends React.Component {
 		return (
 			<g className="axis axis-x">
 				<line
-					stroke="#333"
+					stroke="#bbbbbb"
+					strokeWidth="2"
 					x1={x1} y1={yScale(0)}
 					x2={x2} y2={yScale(0)}
 				/>
 				{xTicks.map((x) => (
 					<g key={x}>
 						<line
-							stroke="#333"
+							stroke="#bbbbbb"
 							x1={xScale(x)} y1={Math.max(y1, y2)}
 							x2={xScale(x)} y2={Math.max(y1, y2) + 5}
 						/>
