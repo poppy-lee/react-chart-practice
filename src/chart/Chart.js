@@ -21,10 +21,10 @@ class Chart extends React.Component {
 		height: 0,
 	}
 
-	getChildProps = (children = this.props.children) => {
+	getLineProps = (children = this.props.children) => {
 		return [].concat(children || [])
+			.filter(({props = {}}) => props.pointList)
 			.map(({props = {}}, index) => ({name: `y${index + 1}`, ...props}))
-			.filter(({pointList}) => pointList)
 	}
 
 	setChildProps = (children, props, _keyPrefix = "") => {
@@ -53,7 +53,7 @@ class Chart extends React.Component {
 		const ChildComponents = this.setChildProps(this.props.children, {
 			width, height,
 			padding: this.getPadding(),
-			childProps: this.getChildProps(),
+			lineProps: this.getLineProps(),
 			...this.getScales(),
 		})
 
@@ -92,14 +92,16 @@ class Chart extends React.Component {
 		return {
 			xScale: d3.scaleLinear()
 				.domain(xDomain)
-				.range([padding.left, width - padding.right]),
+				.range([padding.left, width - padding.right])
+				.nice(),
 			yScale: d3.scaleLinear()
 				.domain(yDomain)
 				.range([height - padding.bottom, padding.top])
+				.nice(),
 		}
 	}
 	getDomains = () => {
-		const points = this.getChildProps()
+		const points = this.getLineProps()
 			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
 			.filter((point) => point)
 

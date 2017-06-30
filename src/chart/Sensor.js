@@ -17,7 +17,7 @@ class Sensor extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 		padding: PropTypes.object,
-		childProps: PropTypes.array,
+		lineProps: PropTypes.array,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 	}
@@ -84,21 +84,19 @@ class Sensor extends React.Component {
 	}
 
 	getX = (mouseX) => {
-		const {xScale, childProps} = this.props
 		const xs = [...new Set(
-			childProps
+			this.props.lineProps
 				.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
 				.filter(({y}) => y)
 				.map(({x}) => x || 0)
 				.sort((xA, xB) => xA - xB)
 		)]
-		return this.getClosestElement(xs, +xScale.invert(mouseX))
+		return this.getClosestElement(xs, +this.props.xScale.invert(mouseX))
 	}
 
 	getYs = (mouseX) => {
-		const {childProps} = this.props
 		const x = this.getX(mouseX)
-		return childProps
+		return this.props.lineProps
 			.map((props, index) => {
 				const pointList = props.pointList || Immutable.List()
 				const point = pointList.find((point) => Immutable.Map(point).get("x") === x)

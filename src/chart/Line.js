@@ -11,6 +11,7 @@ class Line extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 		padding: PropTypes.object,
+		lineProps: PropTypes.array,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 

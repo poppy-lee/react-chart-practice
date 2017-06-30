@@ -3,6 +3,8 @@ import React from "react"
 import ReactDOM from "react-dom"
 
 import Chart from "./chart/Chart"
+import YAxis from "./chart/YAxis"
+import XAxis from "./chart/XAxis"
 import Line from "./chart/Line"
 import Sensor from "./chart/Sensor"
 import Focus from "./chart/Focus"
@@ -21,7 +23,9 @@ function generatePointList(length) {
 }
 
 ReactDOM.render(
-	<Chart width={700} height={360} padding="30px">
+	<Chart width={700} height={360} padding="30px 50px">
+		<YAxis />
+		<XAxis />
 		<Line name="first" pointList={generatePointList(100)} color="#3baeda" />
 		<Line pointList={generatePointList(100)} color="#8cc054" />
 		<Line pointList={generatePointList(100)} color="#f6bb43" />
