@@ -23,10 +23,6 @@ class Focus extends React.Component {
 		),
 	}
 
-	couldRender = () => {
-		return this.props.ys
-	}
-
 	render() {
 		const {
 			width, height, padding,
@@ -34,7 +30,7 @@ class Focus extends React.Component {
 			x, ys
 		} = this.props
 
-		return this.couldRender() ? (
+		return (
 			<g style={{pointerEvents: "none"}}>
 				<line
 					stroke="#777"
@@ -50,7 +46,7 @@ class Focus extends React.Component {
 					/>
 				))}
 			</g>
-		) : null
+		)
 	}
 
 }

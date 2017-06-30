@@ -22,20 +22,13 @@ class Tooltip extends React.Component {
 		),
 	}
 
-	couldRender = () => {
-		return this.props.ys
-	}
-
 	render() {
 		const {mouseX, mouseY, x, ys} = this.props
 
-		return this.couldRender() ? (
+		return (
 			<g
 				transform={`translate(${mouseX}, ${mouseY})`}
-				style={{
-					pointerEvents: "none",
-					// transition: "transform 0.15s ease-in-out",
-				}}
+				style={{pointerEvents: "none"}}
 			>
 				<text x="10" y="20">x: {x}</text>
 				{ys.map(({color, name, y}, index) => (
@@ -47,7 +40,7 @@ class Tooltip extends React.Component {
 					</text>
 				))}
 			</g>
-		) : null
+		)
 	}
 
 }

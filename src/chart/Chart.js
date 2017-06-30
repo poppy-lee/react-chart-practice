@@ -58,7 +58,7 @@ class Chart extends React.Component {
 		})
 
     return (
-      <svg ref="svg"
+			<svg
 				width={String(width)} height={String(height)}
 				style={{border: "1px solid black"}}
 			>
