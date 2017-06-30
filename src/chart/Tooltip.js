@@ -22,18 +22,45 @@ class Tooltip extends React.Component {
 		),
 	}
 
+	componentDidUpdate() {
+		const tooltip = this.refs["tooltip"]
+		const tooltipBg = this.refs["tooltip-bg"]
+
+		tooltipBg.removeAttribute("width", 0)
+		tooltipBg.removeAttribute("height", 0)
+
+		const {top, right, bottom, left} = tooltip.getBoundingClientRect()
+		const width = right - left + 20
+		const height = bottom - top + 20
+
+		tooltipBg.setAttribute("width", width)
+		tooltipBg.setAttribute("height", height)
+	}
+
 	render() {
 		const {mouseX, mouseY, x, ys} = this.props
 
 		return (
-			<g
+			<g ref="tooltip"
 				transform={`translate(${mouseX}, ${mouseY})`}
 				style={{pointerEvents: "none"}}
 			>
-				<text x="10" y="20">x: {x}</text>
+				<rect ref="tooltip-bg"
+					x="10" y="0"
+					rx="5" ry="5"
+					opacity="0.85"
+				/>
+				<text
+					x="20" y="10"
+					dominantBaseline="hanging"
+					fill="white"
+				>
+					x: {x}
+				</text>
 				{ys.map(({color, name, y}, index) => (
 					<text key={index}
-						x="10" y={20 * (index + 2)}
+						x="20" y={20 * (index + 1) + 10}
+						dominantBaseline="hanging"
 						fill={color}
 					>
 						{name}: {y}

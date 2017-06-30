@@ -52,8 +52,8 @@ class Sensor extends React.Component {
 	onMouseEvent = ({clientX, clientY}) => {
 		const mouseX = clientX - this.refs["sensor"].getBoundingClientRect().left
 		const mouseY = clientY - this.refs["sensor"].getBoundingClientRect().top
-		const x = this.getClosestX(mouseX)
-		const ys = this.getPoints(mouseX)
+		const x = this.getX(mouseX)
+		const ys = this.getYs(mouseX)
 
 		this.setState({mouseX, mouseY, x, ys})
 	}
@@ -83,19 +83,7 @@ class Sensor extends React.Component {
 		)
 	}
 
-	getPoints = (mouseX) => {
-		const {childProps} = this.props
-		const x = this.getClosestX(mouseX)
-		return childProps
-			.map((props, index) => {
-				const pointList = props.pointList || Immutable.List()
-				const point = pointList.find((point) => Immutable.Map(point).get("x") === x)
-				return {...props, ...Immutable.Map(point).toObject()}
-			})
-			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
-	}
-
-	getClosestX = (mouseX) => {
+	getX = (mouseX) => {
 		const {xScale, childProps} = this.props
 		const xs = [...new Set(
 			childProps
@@ -105,6 +93,18 @@ class Sensor extends React.Component {
 				.sort((xA, xB) => xA - xB)
 		)]
 		return this.getClosestElement(xs, +xScale.invert(mouseX))
+	}
+
+	getYs = (mouseX) => {
+		const {childProps} = this.props
+		const x = this.getX(mouseX)
+		return childProps
+			.map((props, index) => {
+				const pointList = props.pointList || Immutable.List()
+				const point = pointList.find((point) => Immutable.Map(point).get("x") === x)
+				return {...props, ...Immutable.Map(point).toObject()}
+			})
+			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
 	}
 
 	getClosestElement = (iteratable, targetValue) => {

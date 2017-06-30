@@ -13,8 +13,8 @@ function generatePointList(length) {
 		.map((undef, index) => {
 			return Immutable.Map({
 				x: index,
-				y: 0.10 < Math.random()
-					? (index % 2 ? 1 : -1) * length * Math.random()
+				y: 0.1 < Math.random()
+					? (0.5 < Math.random() ? 1 : -1) * length * Math.random()
 					: null
 			})
 		})
@@ -22,7 +22,7 @@ function generatePointList(length) {
 
 ReactDOM.render(
 	<Chart width={700} height={360} padding="30px">
-		<Line name="first line" pointList={generatePointList(100)} color="#3baeda" />
+		<Line name="first" pointList={generatePointList(100)} color="#3baeda" />
 		<Line pointList={generatePointList(100)} color="#8cc054" />
 		<Line pointList={generatePointList(100)} color="#f6bb43" />
 		<Sensor>
