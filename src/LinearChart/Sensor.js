@@ -17,7 +17,8 @@ class Sensor extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 		padding: PropTypes.object,
-		chartProps: PropTypes.array,
+		getX: PropTypes.func,
+		getYs: PropTypes.func,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 	}
@@ -52,8 +53,8 @@ class Sensor extends React.Component {
 	onMouseEvent = ({clientX, clientY}) => {
 		const mouseX = clientX - this.refs["sensor"].getBoundingClientRect().left
 		const mouseY = clientY - this.refs["sensor"].getBoundingClientRect().top
-		const x = this.getX(mouseX)
-		const ys = this.getYs(mouseX)
+		const x = this.props.getX(mouseX)
+		const ys = this.props.getYs(mouseX)
 
 		this.setState({mouseX, mouseY, x, ys})
 	}
@@ -81,35 +82,6 @@ class Sensor extends React.Component {
 				}
 			</g>
 		)
-	}
-
-	getX = (mouseX) => {
-		const {xScale} = this.props
-
-		const xDomain = xScale.domain()
-		const step = xScale.step()
-		const [minRange, maxRange] = xScale.range()
-
-		const index = Math.round((mouseX - minRange - xScale.bandwidth() / 2) / step)
-
-		return xDomain[Math.max(0, Math.min(index, xDomain.length - 1))]
-	}
-
-	getYs = (mouseX) => {
-		const x = this.getX(mouseX)
-		return this.props.chartProps
-			.map((props, index) => {
-				const pointList = props.pointList || Immutable.List()
-				const point = pointList.find((point) => Immutable.Map(point).get("x") === x)
-				return {...props, ...Immutable.Map(point).toObject()}
-			})
-			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
-	}
-
-	getClosestElement = (iteratable, targetValue) => {
-		return iteratable.reduce((closest, current) => {
-			return Math.abs(current - targetValue) < Math.abs(closest - targetValue) ? current : closest
-		})
 	}
 
 }
