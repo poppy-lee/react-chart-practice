@@ -7,9 +7,15 @@ class XAxis extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 		padding: PropTypes.object,
-		lineProps: PropTypes.array,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
+	}
+
+	getXTicks = (ticks = 7) => {
+		return this.props.xScale.domain()
+			.filter((x, index, xDomain) => {
+				return !(index % Math.round(xDomain.length / ticks))
+			})
 	}
 
 	render() {
@@ -17,7 +23,9 @@ class XAxis extends React.Component {
 
 		const [x1, x2] = xScale.range()
 		const [y1, y2] = yScale.range()
-		const xTicks = xScale.ticks(6)
+
+		const xAlign = xScale.bandwidth() / 2
+		const xTicks = this.getXTicks()
 
 		return (
 			<g className="axis axis-x">
@@ -31,11 +39,11 @@ class XAxis extends React.Component {
 					<g key={x}>
 						<line
 							stroke="#bbbbbb"
-							x1={xScale(x)} y1={Math.max(y1, y2)}
-							x2={xScale(x)} y2={Math.max(y1, y2) + 5}
+							x1={xScale(x) + xAlign} y1={Math.max(y1, y2)}
+							x2={xScale(x) + xAlign} y2={Math.max(y1, y2) + 5}
 						/>
 						<text
-							x={xScale(x)}
+							x={xScale(x) + xAlign}
 							y={Math.max(y1, y2) + 5}
 							textAnchor="middle"
 							dominantBaseline="text-before-edge"

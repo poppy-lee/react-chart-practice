@@ -30,18 +30,20 @@ class Focus extends React.Component {
 			x, ys
 		} = this.props
 
+		const xAlign = xScale.bandwidth() / 2
+
 		return (
 			<g style={{pointerEvents: "none"}}>
 				<line
 					stroke="#777"
 					strokeDasharray="3,3"
-					x1={xScale(x)} y1={padding.top}
-					x2={xScale(x)} y2={height - padding.bottom}
+					x1={xScale(x) + xAlign} y1={padding.top}
+					x2={xScale(x) + xAlign} y2={height - padding.bottom}
 				/>
 				{ys.map(({color, y}, index) => (
 					<circle key={index}
 						r="5"
-						cx={xScale(x)} cy={yScale(y)}
+						cx={xScale(x) + xAlign} cy={yScale(y)}
 						fill={color}
 					/>
 				))}

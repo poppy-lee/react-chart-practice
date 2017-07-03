@@ -17,7 +17,7 @@ class Sensor extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 		padding: PropTypes.object,
-		lineProps: PropTypes.array,
+		chartProps: PropTypes.array,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 	}
@@ -84,19 +84,20 @@ class Sensor extends React.Component {
 	}
 
 	getX = (mouseX) => {
-		const xs = [...new Set(
-			this.props.lineProps
-				.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
-				.filter(({y}) => y)
-				.map(({x}) => x || 0)
-				.sort((xA, xB) => xA - xB)
-		)]
-		return this.getClosestElement(xs, +this.props.xScale.invert(mouseX))
+		const {xScale} = this.props
+
+		const xDomain = xScale.domain()
+		const step = xScale.step()
+		const [minRange, maxRange] = xScale.range()
+
+		const index = Math.round((mouseX - minRange - xScale.bandwidth() / 2) / step)
+
+		return xDomain[Math.max(0, Math.min(index, xDomain.length - 1))]
 	}
 
 	getYs = (mouseX) => {
 		const x = this.getX(mouseX)
-		return this.props.lineProps
+		return this.props.chartProps
 			.map((props, index) => {
 				const pointList = props.pointList || Immutable.List()
 				const point = pointList.find((point) => Immutable.Map(point).get("x") === x)

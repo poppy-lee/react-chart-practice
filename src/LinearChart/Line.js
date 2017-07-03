@@ -11,7 +11,6 @@ class Line extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 		padding: PropTypes.object,
-		lineProps: PropTypes.array,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
@@ -64,7 +63,7 @@ class Line extends React.Component {
 				<circle key={index}
 					fill={color}
 					r={lineWidth}
-					cx={xScale(point.get("x"))}
+					cx={xScale(point.get("x")) + xScale.bandwidth() / 2}
 					cy={yScale(point.get("y"))}
 				/>
 			))
@@ -75,7 +74,7 @@ class Line extends React.Component {
 		return (
 			d3.line()
 				.defined((point) => point && point.y)
-				.x(({x}) => xScale(x))
+				.x(({x}) => xScale(x) + xScale.bandwidth() / 2)
 				.y(({y}) => yScale(y))
 		) (pointList.toJS())
 	}

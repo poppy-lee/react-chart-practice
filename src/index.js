@@ -12,7 +12,7 @@ import Focus from "./LinearChart/Focus"
 import Tooltip from "./LinearChart/Tooltip"
 
 function generatePointList(length) {
-	return Immutable.List([...Array(length)])
+	return Immutable.List([...Array(length + 1)])
 		.map((undef, index) => {
 			return Immutable.Map({
 				x: index,
@@ -27,9 +27,10 @@ ReactDOM.render(
 	<LinearChart width={700} height={360} padding="30px 50px">
 		<YAxis />
 		<XAxis />
-		<Line name="first" pointList={generatePointList(100)} color="#3baeda" />
-		<Bar pointList={generatePointList(100)} color="#8cc054" />
-		<Line pointList={generatePointList(100)} color="#f6bb43" />
+		<Bar name="bar1" pointList={generatePointList(17)} color="#8cc054" />
+		<Bar name="bar2" pointList={generatePointList(17)} color="#f66043" />
+		<Line name="line1" pointList={generatePointList(17)} color="#3baeda" />
+		<Line name="line2" pointList={generatePointList(50)} color="#f6bb43" />
 		<Sensor>
 			<Focus />
 			<Tooltip />

@@ -21,10 +21,18 @@ class LinearChart extends React.Component {
 		height: 0,
 	}
 
-	getLineProps = (children = this.props.children) => {
+	getChartProps = (children = this.props.children) => {
 		return [].concat(children || [])
 			.filter(({props = {}}) => props.pointList)
-			.map(({props = {}}, index) => ({name: `y${index + 1}`, ...props}))
+			.map(({type, props = {}}, index) => ({type: type.name, name: `y${index + 1}`, ...props}))
+	}
+	getLineProps = (children = this.props.children) => {
+		return this.getChartProps(children)
+			.filter(({type}) => type === "Line")
+	}
+	getBarProps = (children = this.props.children) => {
+		return this.getChartProps(children)
+			.filter(({type}) => type === "Bar")
 	}
 
 	setChildProps = (children, props, _keyPrefix = "") => {
@@ -53,7 +61,9 @@ class LinearChart extends React.Component {
 		const ChildComponents = this.setChildProps(this.props.children, {
 			width, height,
 			padding: this.getPadding(),
+			chartProps: this.getChartProps(),
 			lineProps: this.getLineProps(),
+			barProps: this.getBarProps(),
 			...this.getScales(),
 		})
 
@@ -90,10 +100,11 @@ class LinearChart extends React.Component {
 		const {xDomain, yDomain} = this.getDomains()
 
 		return {
-			xScale: d3.scaleLinear()
+			xScale: d3.scaleBand()
 				.domain(xDomain)
 				.range([padding.left, width - padding.right])
-				.nice(),
+				.padding(this.getBarProps().length ? 0.2 : 0)
+				.align(0.5),
 			yScale: d3.scaleLinear()
 				.domain(yDomain)
 				.range([height - padding.bottom, padding.top])
@@ -101,15 +112,24 @@ class LinearChart extends React.Component {
 		}
 	}
 	getDomains = () => {
-		const points = this.getLineProps()
+		const points = this.getChartProps()
 			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
 			.filter((point) => point)
 
-		const xs = points.map(({x}) => x || 0)
+		const xs = [...new Set(
+			points
+				.filter(({y}) => Number.isFinite(y))
+				.map(({x}) => x || 0)
+				.sort((xA, xB) => {
+					if (xA > xB) return 1
+					if (xA < xB) return -1
+					return 0
+				})
+		)]
 		const ys = points.map(({y}) => y || 0)
 
 		return {
-			xDomain: d3.extent(xs),
+			xDomain: xs,
 			yDomain: d3.extent([0, ...ys]),
 		}
 	}
