@@ -26,14 +26,6 @@ class LinearChart extends React.Component {
 			.filter(({props = {}}) => props.pointList)
 			.map(({type, props = {}}, index) => ({type: type.name, name: `y${index + 1}`, ...props}))
 	}
-	getLineProps = (children = this.props.children) => {
-		return this.getChartProps(children)
-			.filter(({type}) => type === "Line")
-	}
-	getBarProps = (children = this.props.children) => {
-		return this.getChartProps(children)
-			.filter(({type}) => type === "Bar")
-	}
 
 	setChildProps = (children, props, _keyPrefix = "") => {
 		return [].concat(children || [])
@@ -59,11 +51,9 @@ class LinearChart extends React.Component {
 		const {width, height} = this.props
 
 		const ChildComponents = this.setChildProps(this.props.children, {
-			width, height,
-			padding: this.getPadding(),
-			chartProps: this.getChartProps(),
-			lineProps: this.getLineProps(),
-			barProps: this.getBarProps(),
+			width, height, padding: this.getPadding(),
+			getX: this.getX,
+			getYs: this.getYs,
 			...this.getScales(),
 		})
 
@@ -76,6 +66,21 @@ class LinearChart extends React.Component {
 			</svg>
     )
   }
+
+	getX = (mouseX) => {
+		const {xScale} = this.getScales()
+		return this.getClosestElement(this.getUniqueXs(), +xScale.invert(mouseX))
+	}
+	getYs = (mouseX) => {
+		const x = this.getX(mouseX)
+		return this.getChartProps()
+			.map((props, index) => {
+				const pointList = props.pointList || Immutable.List()
+				const point = pointList.find((point) => Immutable.Map(point).get("x") === x)
+				return {...props, ...Immutable.Map(point).toObject()}
+			})
+			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
+	}
 
 	getPadding = () => {
 		const {
@@ -100,38 +105,50 @@ class LinearChart extends React.Component {
 		const {xDomain, yDomain} = this.getDomains()
 
 		return {
-			xScale: d3.scaleBand()
+			xScale: d3.scaleLinear()
 				.domain(xDomain)
-				.range([padding.left, width - padding.right])
-				.padding(this.getBarProps().length ? 0.2 : 0)
-				.align(0.5),
+				.range([padding.left + 10, width - padding.right - 10]),
 			yScale: d3.scaleLinear()
 				.domain(yDomain)
 				.range([height - padding.bottom, padding.top])
 				.nice(),
 		}
 	}
+
 	getDomains = () => {
+		return {
+			xDomain: d3.extent(this.getUniqueXs()),
+			yDomain: d3.extent([0, ...this.getUniqueYs()]),
+		}
+	}
+
+	getUniqueXs = () => {
 		const points = this.getChartProps()
 			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
-			.filter((point) => point)
+			.filter((point) => point && Number.isFinite(point.y))
+		return [...new Set(points.map(({x}) => x || 0))]
+			.sort((a, b) => {
+				if (a > b) return 1
+				if (a < b) return -1
+				return 0
+			})
+	}
+	getUniqueYs = () => {
+		const points = this.getChartProps()
+			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
+			.filter((point) => point && Number.isFinite(point.y))
+		return [...new Set(points.map(({y}) => y || 0))]
+			.sort((a, b) => {
+				if (a > b) return 1
+				if (a < b) return -1
+				return 0
+			})
+	}
 
-		const xs = [...new Set(
-			points
-				.filter(({y}) => Number.isFinite(y))
-				.map(({x}) => x || 0)
-				.sort((xA, xB) => {
-					if (xA > xB) return 1
-					if (xA < xB) return -1
-					return 0
-				})
-		)]
-		const ys = points.map(({y}) => y || 0)
-
-		return {
-			xDomain: xs,
-			yDomain: d3.extent([0, ...ys]),
-		}
+	getClosestElement = (iteratable, targetValue) => {
+		return iteratable.reduce((closest, current) => {
+			return Math.abs(current - targetValue) < Math.abs(closest - targetValue) ? current : closest
+		})
 	}
 
 }

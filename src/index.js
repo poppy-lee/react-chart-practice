@@ -24,7 +24,7 @@ function generatePointList(length) {
 }
 
 ReactDOM.render(
-	<LinearChart width={700} height={360} padding="30px 50px">
+	<LinearChart width={700} height={360} padding="10px 30px 40px 50px">
 		<YAxis />
 		<XAxis />
 		<Bar name="bar1" pointList={generatePointList(17)} color="#8cc054" />

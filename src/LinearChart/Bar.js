@@ -31,7 +31,6 @@ class Bar extends React.Component {
 
 	render() {
 		const {
-			barProps,
 			xScale, yScale,
 			color,
 		} = this.props
