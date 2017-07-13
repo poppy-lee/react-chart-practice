@@ -13,64 +13,88 @@ class LinearChart extends React.Component {
 		paddingTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		paddingRight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		paddingBottom: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-		paddingLeft: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+		paddingLeft: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+		colorArray: PropTypes.array,
 	}
 
 	static defaultProps = {
 		width: 0,
 		height: 0,
+		colorArray: d3.schemeCategory10,
 	}
 
 	getChartProps = (children = this.props.children) => {
+		const {colorArray} = this.props
 		return [].concat(children || [])
 			.filter(({props = {}}) => props.pointList)
-			.map(({type, props = {}}, index) => ({type: type.name, name: `y${index + 1}`, ...props}))
-	}
-
-	setChildProps = (children, props, _keyPrefix = "") => {
-		return [].concat(children || [])
-			.map((child, index) => {
-				child = child || {type: () => null, props: null}
-
-				const _key = _keyPrefix ? `${_keyPrefix}-${index}` : index
-				const _props = Object.assign({}, props, child.props)
-				const _children = _props.children
-
-				switch (true) {
-					case _children:
-						return this.injectProps(_children, _props, _key)
-					case child instanceof Array:
-						return this.injectProps(child, _props, _key)
-				}
-
-				return <child.type key={_key} {..._props} />
-			})
+			.map(({type, props = {}}, index) => ({
+				index, type: type.name,
+				color: colorArray[index % colorArray.length],
+				name: `y${index + 1}`,
+				...props,
+			}))
 	}
 
   render() {
 		const {width, height} = this.props
-
-		const ChildComponents = this.setChildProps(this.props.children, {
-			width, height, padding: this.getPadding(),
-			getX: this.getX,
-			getYs: this.getYs,
-			...this.getScales(),
-		})
 
     return (
 			<svg
 				width={String(width)} height={String(height)}
 				style={{border: "1px solid black"}}
 			>
-				{ChildComponents}
+				{this.renderAxes({
+					width, height, padding: this.getPadding(),
+					...this.getScales(),
+				})}
+				{this.renderCharts({
+					width, height, padding: this.getPadding(),
+					...this.getScales(),
+				})}
+				{this.renderSensor({
+					width, height, padding: this.getPadding(),
+					getX: this.getX,
+					getYs: this.getYs,
+					...this.getScales(),
+				})}
 			</svg>
     )
-  }
+	}
+
+	renderAxes = (props) => {
+		return [].concat(this.props.children || [])
+			.filter(({type}) => ["XAxis", "YAxis"].includes(type.name))
+			.map((child, index) => {
+				child = child || {type: () => null, props: null}
+				return <child.type key={`axis-${index}`} {...Object.assign({}, props, child.props)} />
+			})
+	}
+
+	renderCharts = (props) => {
+		return [].concat(this.props.children || [])
+			.filter(({props = {}}) => props.pointList)
+			.map((child, index) => {
+				child = child || {type: () => null, props: null}
+				return <child.type key={`chart-${index}`} {...Object.assign({
+					color: this.props.colorArray[index % this.props.colorArray.length]
+				}, props, child.props)} />
+			})
+	}
+
+	renderSensor = (props) => {
+		return [].concat(this.props.children || [])
+			.filter(({type}) => ["Sensor"].includes(type.name))
+			.map((child, index) => {
+				child = child || {type: () => null, props: null}
+				return <child.type key={`sensor-${index}`} {...Object.assign({}, props, child.props)} />
+			})
+	}
 
 	getX = (mouseX) => {
 		const {xScale} = this.getScales()
 		return this.getClosestElement(this.getUniqueXs(), +xScale.invert(mouseX))
 	}
+
 	getYs = (mouseX) => {
 		const x = this.getX(mouseX)
 		return this.getChartProps()
@@ -133,6 +157,7 @@ class LinearChart extends React.Component {
 				return 0
 			})
 	}
+
 	getUniqueYs = () => {
 		const points = this.getChartProps()
 			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])

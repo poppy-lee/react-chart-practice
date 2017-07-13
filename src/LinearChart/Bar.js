@@ -16,10 +16,6 @@ class Bar extends React.Component {
 		color: PropTypes.string,
 	}
 
-	static defaultProps = {
-		color: "#333333",
-	}
-
 	getPointList = () => {
 		return this.props.pointList
 			.sort((pointA, pointB) => {

@@ -27,10 +27,10 @@ ReactDOM.render(
 	<LinearChart width={700} height={360} padding="10px 30px 40px 50px">
 		<YAxis />
 		<XAxis />
-		<Bar name="bar1" pointList={generatePointList(17)} color="#8cc054" />
-		<Bar name="bar2" pointList={generatePointList(17)} color="#f66043" />
-		<Line name="line1" pointList={generatePointList(17)} color="#3baeda" />
-		<Line name="line2" pointList={generatePointList(50)} color="#f6bb43" />
+		<Bar name="set name" pointList={generatePointList(17)} />
+		<Bar color="#3baeda" pointList={generatePointList(17)} />
+		<Line name="set both" color="gold" pointList={generatePointList(17)} />
+		<Line pointList={generatePointList(50)} />
 		<Sensor>
 			<Focus />
 			<Tooltip />

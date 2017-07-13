@@ -48,12 +48,12 @@ class Tooltip extends React.Component {
 				<rect ref="tooltip-bg"
 					x="10" y="0"
 					rx="5" ry="5"
+					fill="#ffffff"
 					opacity="0.85"
 				/>
 				<text
 					x="20" y="10"
 					dominantBaseline="hanging"
-					fill="white"
 				>
 					x: {x}
 				</text>

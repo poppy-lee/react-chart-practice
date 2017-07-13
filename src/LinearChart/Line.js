@@ -21,7 +21,6 @@ class Line extends React.Component {
 
 	static defaultProps = {
 		lineWidth: 2.5,
-		color: "#333333",
 	}
 
 	getPointList = () => {
@@ -51,8 +50,8 @@ class Line extends React.Component {
 
 	renderCircles = () => {
 		const {
-			xScale, yScale,
-			lineWidth, color
+			xScale, yScale, index,
+			color, lineWidth,
 		} = this.props
 
 		return this.getPointList()
