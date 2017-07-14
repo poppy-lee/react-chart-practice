@@ -8,9 +8,6 @@ import React from "react"
 class Line extends React.Component {
 
 	static propTypes = {
-		width: PropTypes.number,
-		height: PropTypes.number,
-		padding: PropTypes.object,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 

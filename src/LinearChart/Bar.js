@@ -5,14 +5,11 @@ import React from "react"
 class Bar extends React.Component {
 
 	static propTypes = {
-		width: PropTypes.number,
-		height: PropTypes.number,
-		padding: PropTypes.object,
-		barProps: PropTypes.array,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
 		pointList: ImmutablePropTypes.list.isRequired,
+		barWidth: PropTypes.number,
 		color: PropTypes.string,
 	}
 
@@ -28,10 +25,9 @@ class Bar extends React.Component {
 	render() {
 		const {
 			xScale, yScale,
+			barWidth = 10,
 			color,
 		} = this.props
-
-		const width = xScale.bandwidth ? xScale.bandwidth() : 5
 
 		return (
 			<g>
@@ -40,8 +36,8 @@ class Bar extends React.Component {
 					return (
 						<rect key={point.get("x")}
 							fill={color}
-							width={width} height={Math.abs(height)}
-							x={xScale(point.get("x"))}
+							width={barWidth} height={Math.abs(height)}
+							x={xScale(point.get("x")) - barWidth / 2}
 							y={height < 0 ? yScale(point.get("y")) : yScale(0)}
 						/>
 					)

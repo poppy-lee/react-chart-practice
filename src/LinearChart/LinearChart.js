@@ -48,7 +48,7 @@ class LinearChart extends React.Component {
 					...this.getScales(),
 				})}
 				{this.renderCharts({
-					width, height, padding: this.getPadding(),
+					barWidth: this.getBarWidth(),
 					...this.getScales(),
 				})}
 				{this.renderSensor({
@@ -122,6 +122,19 @@ class LinearChart extends React.Component {
 		}
 	}
 
+	getBarWidth = () => {
+		const {xScale} = this.getScales()
+		const uniqueXs = this.getUniqueXs()
+
+		const maxX = Math.max(...uniqueXs)
+		const interval = Math.min(...uniqueXs
+			.map((x, index, xs) => x - (xs[index - 1] || 0))
+			.filter((interval) => interval)
+		)
+
+		return xScale(maxX) - xScale(maxX - interval)
+	}
+
 	getScales = () => {
 		const {width, height} = this.props
 
@@ -131,7 +144,7 @@ class LinearChart extends React.Component {
 		return {
 			xScale: d3.scaleLinear()
 				.domain(xDomain)
-				.range([padding.left + 10, width - padding.right - 10]),
+				.range([padding.left + 10, width - (padding.right + 10)]),
 			yScale: d3.scaleLinear()
 				.domain(yDomain)
 				.range([height - padding.bottom, padding.top])
@@ -140,8 +153,17 @@ class LinearChart extends React.Component {
 	}
 
 	getDomains = () => {
+		const uniqueXs = this.getUniqueXs()
+		const xInterval = Math.min(...uniqueXs
+			.map((x, index, xs) => x - (xs[index - 1] || 0))
+			.filter((interval) => interval)
+		)
+
 		return {
-			xDomain: d3.extent(this.getUniqueXs()),
+			xDomain: [
+				Math.min(...uniqueXs) - xInterval / 2,
+				Math.max(...uniqueXs) + xInterval / 2,
+			],
 			yDomain: d3.extent([0, ...this.getUniqueYs()]),
 		}
 	}

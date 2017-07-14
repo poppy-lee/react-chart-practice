@@ -16,20 +16,21 @@ function generatePointList(length) {
 		.map((undef, index) => {
 			return Immutable.Map({
 				x: index,
-				y: 0.1 < Math.random()
+				y: 0.5 < Math.random()
 					? (0.5 < Math.random() ? 1 : -1) * length * Math.random()
 					: null
 			})
 		})
+		.filter((point) => point.get("y"))
 }
 
 ReactDOM.render(
-	<LinearChart width={700} height={360} padding="10px 30px 40px 50px">
+	<LinearChart width={700} height={360} padding="30px 30px 40px 50px">
 		<YAxis />
 		<XAxis />
-		<Bar name="set name" pointList={generatePointList(17)} />
-		<Bar color="#3baeda" pointList={generatePointList(17)} />
-		<Line name="set both" color="gold" pointList={generatePointList(17)} />
+		<Bar pointList={generatePointList(10)} />
+		<Bar pointList={generatePointList(10)} />
+		<Line pointList={generatePointList(10)} />
 		<Line pointList={generatePointList(50)} />
 		<Sensor>
 			<Focus />
