@@ -8,7 +8,7 @@ const initialState = {
 	mouseX: undefined,
 	mouseY: undefined,
 	x: undefined,
-	pointLists: undefined,
+	ys: undefined,
 }
 
 class Sensor extends React.Component {
