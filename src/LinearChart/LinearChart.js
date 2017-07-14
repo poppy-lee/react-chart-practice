@@ -53,9 +53,9 @@ class LinearChart extends React.Component {
 				})}
 				{this.renderSensor({
 					width, height, padding: this.getPadding(),
-					getX: this.getX,
-					getYs: this.getYs,
 					...this.getScales(),
+					...this.getXYs(),
+					chartProps: this.getChartProps(),
 				})}
 			</svg>
     )
@@ -90,22 +90,6 @@ class LinearChart extends React.Component {
 			})
 	}
 
-	getX = (mouseX) => {
-		const {xScale} = this.getScales()
-		return this.getClosestElement(this.getUniqueXs(), +xScale.invert(mouseX))
-	}
-
-	getYs = (mouseX) => {
-		const x = this.getX(mouseX)
-		return this.getChartProps()
-			.map((props, index) => {
-				const pointList = props.pointList || Immutable.List()
-				const point = pointList.find((point) => Immutable.Map(point).get("x") === x)
-				return {...props, ...Immutable.Map(point).toObject()}
-			})
-			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
-	}
-
 	getPadding = () => {
 		const {
 			padding = "",
@@ -124,10 +108,10 @@ class LinearChart extends React.Component {
 
 	getBarWidth = () => {
 		const {xScale} = this.getScales()
-		const uniqueXs = this.getUniqueXs()
+		const {xs} = this.getXYs()
 
-		const maxX = Math.max(...uniqueXs)
-		const interval = Math.min(...uniqueXs
+		const maxX = Math.max(...xs)
+		const interval = Math.min(...xs
 			.map((x, index, xs) => x - (xs[index - 1] || 0))
 			.filter((interval) => interval)
 		)
@@ -153,49 +137,41 @@ class LinearChart extends React.Component {
 	}
 
 	getDomains = () => {
-		const uniqueXs = this.getUniqueXs()
-		const xInterval = Math.min(...uniqueXs
+		const {xs, ys} = this.getXYs()
+
+		const xInterval = Math.min(...xs
 			.map((x, index, xs) => x - (xs[index - 1] || 0))
 			.filter((interval) => interval)
 		)
 
 		return {
 			xDomain: [
-				Math.min(...uniqueXs) - xInterval / 2,
-				Math.max(...uniqueXs) + xInterval / 2,
+				Math.min(...xs) - xInterval / 2,
+				Math.max(...xs) + xInterval / 2,
 			],
-			yDomain: d3.extent([0, ...this.getUniqueYs()]),
+			yDomain: d3.extent([0, ...ys]),
 		}
 	}
 
-	getUniqueXs = () => {
+	getXYs = () => {
 		const points = this.getChartProps()
 			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
 			.filter((point) => point && Number.isFinite(point.y))
-		return [...new Set(points.map(({x}) => x || 0))]
-			.sort((a, b) => {
-				if (a > b) return 1
-				if (a < b) return -1
-				return 0
-			})
-	}
 
-	getUniqueYs = () => {
-		const points = this.getChartProps()
-			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
-			.filter((point) => point && Number.isFinite(point.y))
-		return [...new Set(points.map(({y}) => y || 0))]
-			.sort((a, b) => {
-				if (a > b) return 1
-				if (a < b) return -1
-				return 0
-			})
-	}
-
-	getClosestElement = (iteratable, targetValue) => {
-		return iteratable.reduce((closest, current) => {
-			return Math.abs(current - targetValue) < Math.abs(closest - targetValue) ? current : closest
-		})
+		return {
+			xs: [...new Set(points.map(({x}) => x || 0))]
+				.sort((a, b) => {
+					if (a > b) return 1
+					if (a < b) return -1
+					return 0
+				}),
+			ys: [...new Set(points.map(({y}) => y || 0))]
+				.sort((a, b) => {
+					if (a > b) return 1
+					if (a < b) return -1
+					return 0
+				}),
+		}
 	}
 
 }

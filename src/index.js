@@ -16,7 +16,7 @@ function generatePointList(length) {
 		.map((undef, index) => {
 			return Immutable.Map({
 				x: index,
-				y: 0.5 < Math.random()
+				y: 0.1 < Math.random()
 					? (0.5 < Math.random() ? 1 : -1) * length * Math.random()
 					: null
 			})
@@ -28,10 +28,10 @@ ReactDOM.render(
 	<LinearChart width={700} height={360} padding="30px 30px 40px 50px">
 		<YAxis />
 		<XAxis />
-		<Bar pointList={generatePointList(10)} />
-		<Bar pointList={generatePointList(10)} />
-		<Line pointList={generatePointList(10)} />
-		<Line pointList={generatePointList(50)} />
+		<Bar pointList={generatePointList(1000)} />
+		<Bar pointList={generatePointList(1000)} />
+		<Line pointList={generatePointList(1000)} />
+		<Line pointList={generatePointList(1000)} />
 		<Sensor>
 			<Focus />
 			<Tooltip />

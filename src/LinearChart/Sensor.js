@@ -8,7 +8,7 @@ const initialState = {
 	mouseX: undefined,
 	mouseY: undefined,
 	x: undefined,
-	ys: undefined,
+	pointLists: undefined,
 }
 
 class Sensor extends React.Component {
@@ -17,55 +17,49 @@ class Sensor extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 		padding: PropTypes.object,
-		getX: PropTypes.func,
-		getYs: PropTypes.func,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
+		xs: PropTypes.array,
+		chartProps: PropTypes.array,
 	}
 
 	state = initialState
 
-	shouldRenderChildComponents() {
-		const {mouseX, mouseY, ys} = this.state
-		return Number.isFinite(mouseX + mouseY) && ys
+	getClosestElement = (iteratable = [], targetValue = 0) => {
+		return iteratable.reduce((closest, current) => {
+			return Math.abs(current - targetValue) < Math.abs(closest - targetValue) ? current : closest
+		})
 	}
 
-	setChildProps = (children, props, _keyPrefix = "") => {
-		return [].concat(children || [])
-			.map((child, index) => {
-				child = child || {type: () => null, props: null}
+	getX = (mouseX) => {
+		const {xScale, xs} = this.props
+		return this.getClosestElement(xs, +xScale.invert(mouseX))
+	}
 
-				const _key = _keyPrefix ? `${_keyPrefix}-${index}` : index
-				const _props = Object.assign({}, props, child.props)
-				const _children = _props.children
+	getYs = (mouseX) => {
+		const {chartProps} = this.props
+		const x = this.getX(mouseX)
 
-				switch (true) {
-					case _children:
-						return this.injectProps(_children, _props, _key)
-					case child instanceof Array:
-						return this.injectProps(child, _props, _key)
-				}
-
-				return <child.type key={_key} {..._props} />
+		return chartProps
+			.map((props, index) => {
+				const pointList = props.pointList || Immutable.List()
+				const point = pointList.find((point) => Immutable.Map(point).get("x") === x)
+				return {...props, ...Immutable.Map(point).toObject()}
 			})
+			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
 	}
 
 	onMouseEvent = ({clientX, clientY}) => {
 		const mouseX = clientX - this.refs["sensor"].getBoundingClientRect().left
 		const mouseY = clientY - this.refs["sensor"].getBoundingClientRect().top
-		const x = this.props.getX(mouseX)
-		const ys = this.props.getYs(mouseX)
+		const x = this.getX(mouseX)
+		const ys = this.getYs(mouseX)
 
 		this.setState({mouseX, mouseY, x, ys})
 	}
 
 	render() {
 		const {width, height} = this.props
-
-		const ChildComponents = this.setChildProps(this.props.children, {
-			...this.props,
-			...this.state,
-		})
 
 		return (
 			<g>
@@ -76,12 +70,24 @@ class Sensor extends React.Component {
 					onMouseMove={this.onMouseEvent}
 					onMouseLeave={() => this.setState(initialState)}
 				/>
-				{this.shouldRenderChildComponents()
-					? ChildComponents
-					: null
-				}
+				{this.renderChildComponents({...this.props, ...this.state})}
 			</g>
 		)
+	}
+
+	shouldRenderChildComponents = () => {
+		const {mouseX, mouseY, ys} = this.state
+		return Number.isFinite(mouseX + mouseY) && ys
+	}
+
+	renderChildComponents = (props) => {
+		return this.shouldRenderChildComponents()
+			? [].concat(this.props.children || [])
+				.map((child, index) => {
+					child = child || {type: () => null, props: null}
+					return <child.type key={`sensor-child-${index}`} {...Object.assign({}, props, child.props)} />
+				})
+			: null
 	}
 
 }
