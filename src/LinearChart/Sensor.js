@@ -62,13 +62,15 @@ class Sensor extends React.Component {
 		const {width, height} = this.props
 
 		return (
-			<g>
+			<g
+				style={{pointerEvents: "all"}}
+				onMouseEnter={this.onMouseEvent}
+				onMouseMove={this.onMouseEvent}
+				onMouseLeave={() => this.setState(initialState)}
+			>
 				<rect ref="sensor"
 					width={String(width)} height={String(height)}
-					style={{fill: "none", pointerEvents: "all"}}
-					onMouseEnter={this.onMouseEvent}
-					onMouseMove={this.onMouseEvent}
-					onMouseLeave={() => this.setState(initialState)}
+					style={{fill: "none"}}
 				/>
 				{this.renderChildComponents({...this.props, ...this.state})}
 			</g>

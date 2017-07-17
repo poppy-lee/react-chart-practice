@@ -23,6 +23,8 @@ class LinearChart extends React.Component {
 		colorArray: d3.schemeCategory10,
 	}
 
+	pixelRatio = 2 * (window.devicePixelRatio || 1)
+
 	getChartProps = (children = this.props.children) => {
 		const {colorArray} = this.props
 		return [].concat(children || [])
@@ -71,13 +73,23 @@ class LinearChart extends React.Component {
 	}
 
 	renderCharts = (props) => {
+		const {width} = this.props
+		const padding = this.getPadding()
+
+		const chartWidth = width - (padding.left + padding.right)
+
 		return [].concat(this.props.children || [])
 			.filter(({props = {}}) => props.pointList)
 			.map((child, index) => {
 				child = child || {type: () => null, props: null}
 				return <child.type key={`chart-${index}`} {...Object.assign({
 					color: this.props.colorArray[index % this.props.colorArray.length]
-				}, props, child.props)} />
+				}, props, child.props, {
+					pointList: child.props.pointList
+						.filter((point, index) => {
+							return !(index % Math.round(child.props.pointList.size / (chartWidth * this.pixelRatio)))
+						})
+				})} />
 			})
 	}
 
@@ -107,6 +119,7 @@ class LinearChart extends React.Component {
 	}
 
 	getBarWidth = () => {
+		const {width} = this.props
 		const {xScale} = this.getScales()
 		const {xs} = this.getXYs()
 
@@ -116,7 +129,7 @@ class LinearChart extends React.Component {
 			.filter((interval) => interval)
 		)
 
-		return xScale(maxX) - xScale(maxX - interval)
+		return Math.max(1 / (this.pixelRatio), xScale(maxX) - xScale(maxX - interval))
 	}
 
 	getScales = () => {
