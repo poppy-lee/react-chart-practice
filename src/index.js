@@ -22,10 +22,10 @@ ReactDOM.render(
 			<YAxis />
 			<XAxis />
 			<Bar pointList={generatePointList(LENGTH)} />
+			<Line pointList={generatePointList(LENGTH)} />
 			<Bar pointList={generatePointList(LENGTH)} />
-			<Line pointList={generatePointList(LENGTH)} />
-			<Line pointList={generatePointList(LENGTH)} />
-			<Sensor sticky>
+			<Bar pointList={generatePointList(LENGTH)} />
+			<Sensor>
 				<Focus />
 				<Tooltip />
 			</Sensor>
@@ -39,7 +39,7 @@ function generatePointList(length) {
 		.map((undef, index) => {
 			return Immutable.Map({
 				x: index,
-				x: length * Math.random(),
+				// x: length * Math.random(),
 				y: 0.1 < Math.random()
 					? length * Math.random()
 					: null,

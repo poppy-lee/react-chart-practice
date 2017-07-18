@@ -27,16 +27,19 @@ class LinearChart extends React.Component {
 
 	getChartProps = (children = this.props.children) => {
 		const {colorArray} = this.props
+		const typeCounts = {}
 		return [].concat(children || [])
 			.filter(({props = {}}) => props.pointList)
-			.map(({type, props = {}}, index) => ({
-				index, type: type.name,
-				color: colorArray[index % colorArray.length],
-				name: `y${index + 1}`,
-				...props,
-				pointList: (props.pointList || Immutable.List())
-					.sort(sortPoint),
-			}))
+			.map(({type = () => null, props = {}}, index) => {
+				if (!typeCounts[type.name]) typeCounts[type.name] = 0
+				return {
+					index, type: type.name, typeIndex: typeCounts[type.name]++,
+					color: colorArray[index % colorArray.length],
+					name: `y${index + 1}`,
+					...props,
+					pointList: props.pointList.sort(sortPoint),
+				}
+			})
 	}
 
   render() {
@@ -69,30 +72,31 @@ class LinearChart extends React.Component {
 		return [].concat(this.props.children || [])
 			.filter(({type}) => ["XAxis", "YAxis"].includes(type.name))
 			.map((child, index) => {
-				child = child || {type: () => null, props: null}
-				return <child.type key={`axis-${index}`} {...Object.assign({}, props, child.props)} />
+				child = child || {type: () => null, props: {}}
+				return <child.type key={`axis-${index}`} {...{...props, ...child.props}} />
 			})
 	}
 
 	renderCharts = (props) => {
 		const {width} = this.props
+		const {colorArray} = this.props
+
 		const padding = this.getPadding()
 
 		const chartWidth = width - (padding.left + padding.right)
+		const chartPixels = chartWidth * this.pixelRatio
+		const chartProps = this.getChartProps()
 
 		return [].concat(this.props.children || [])
 			.filter(({props = {}}) => props.pointList)
 			.map((child, index) => {
-				child = child || {type: () => null, props: null}
-				return <child.type key={`chart-${index}`} {...Object.assign({
-					color: this.props.colorArray[index % this.props.colorArray.length]
-				}, props, child.props, {
-					pointList: child.props.pointList
-						.sort(sortPoint)
-						.filter((point, index) => {
-							return !(index % Math.round(child.props.pointList.size / (chartWidth * this.pixelRatio)))
-						})
-				})} />
+				child = child || {type: () => null, props: {}}
+				return <child.type key={`chart-${index}`} {...{
+					...chartProps[index], ...props, ...child.props,
+					typeCount: Math.max(...chartProps.map(({type, typeIndex}) => type === child.type.name && typeIndex + 1)),
+					pointList: child.props.pointList.sort(sortPoint)
+						.filter((point, index) => !(index % Math.round(child.props.pointList.size / chartPixels)))
+				}} />
 			})
 	}
 
@@ -100,8 +104,8 @@ class LinearChart extends React.Component {
 		return [].concat(this.props.children || [])
 			.filter(({type}) => ["Sensor"].includes(type.name))
 			.map((child, index) => {
-				child = child || {type: () => null, props: null}
-				return <child.type key={`sensor-${index}`} {...Object.assign({}, props, child.props)} />
+				child = child || {type: () => null, props: {}}
+				return <child.type key={`sensor-${index}`} {...{...props, ...child.props}} />
 			})
 	}
 
@@ -139,7 +143,7 @@ class LinearChart extends React.Component {
 			.filter((interval) => interval)
 		)
 
-		return Math.max(1 / (this.pixelRatio), Math.min(...[
+		return Math.max(1 / this.pixelRatio, Math.min(...[
 			Math.abs(xScale(maxX) - xScale(maxX - interval)),
 			2 * Math.abs(xScale(minX) - xScale.range()[0]),
 			2 * Math.abs(xScale(maxX) - xScale.range()[1]),

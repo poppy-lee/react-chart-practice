@@ -17,6 +17,7 @@ class Tooltip extends React.Component {
 		ys: PropTypes.arrayOf(
 			PropTypes.shape({
 				color: PropTypes.string,
+				type: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 			})
@@ -60,17 +61,15 @@ class Tooltip extends React.Component {
 					fill="#ffffff"
 					opacity="0.85"
 				/>
-				{!sticky && (
-					<text
-						x="20" y="10"
-						dominantBaseline="hanging"
-					>
-						x: {x}
-					</text>
-				)}
+				<text
+					x="20" y="10"
+					dominantBaseline="hanging"
+				>
+					{sticky ? "sticky" : `x: ${x}`}
+				</text>
 				{ys.map(({color, name, x, y}, index) => (
 					<text key={index}
-						x="20" y={20 * (index + (!sticky ? 1 : 0)) + 10}
+						x="20" y={20 * (index + 1) + 10}
 						dominantBaseline="hanging"
 						fill={color}
 					>

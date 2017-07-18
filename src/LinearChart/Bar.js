@@ -8,7 +8,11 @@ class Bar extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
+		index: PropTypes.number,
 		pointList: ImmutablePropTypes.list.isRequired,
+		type: PropTypes.string,
+		typeIndex: PropTypes.number,
+		typeCount: PropTypes.number,
 		barWidth: PropTypes.number,
 		color: PropTypes.string,
 	}
@@ -25,8 +29,7 @@ class Bar extends React.Component {
 	render() {
 		const {
 			xScale, yScale,
-			barWidth = 10,
-			color,
+			typeIndex, typeCount, barWidth, color,
 		} = this.props
 
 		return (
@@ -36,8 +39,8 @@ class Bar extends React.Component {
 					return (
 						<rect key={point.get("x")}
 							fill={color}
-							width={barWidth} height={Math.abs(height)}
-							x={xScale(point.get("x")) - barWidth / 2}
+							width={barWidth / typeCount} height={Math.abs(height)}
+							x={xScale(point.get("x")) - barWidth / 2 + barWidth / typeCount * typeIndex}
 							y={height < 0 ? yScale(point.get("y")) : yScale(0)}
 						/>
 					)

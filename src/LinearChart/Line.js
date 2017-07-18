@@ -11,7 +11,11 @@ class Line extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
+		index: PropTypes.number,
 		pointList: ImmutablePropTypes.list.isRequired,
+		type: PropTypes.string,
+		typeIndex: PropTypes.number,
+		typeCount: PropTypes.number,
 		lineWidth: PropTypes.number,
 		color: PropTypes.string,
 	}

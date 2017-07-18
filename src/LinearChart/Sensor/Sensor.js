@@ -84,8 +84,8 @@ class Sensor extends React.Component {
 		return this.shouldRenderChildComponents()
 			? [].concat(this.props.children || [])
 				.map((child, index) => {
-					child = child || {type: () => null, props: null}
-					return <child.type key={`sensor-child-${index}`} {...Object.assign({}, props, child.props)} />
+					child = child || {type: () => null, props: {}}
+					return <child.type key={`sensor-child-${index}`} {...{...props, ...child.props}} />
 				})
 			: null
 	}

@@ -18,6 +18,7 @@ class Focus extends React.Component {
 		ys: PropTypes.arrayOf(
 			PropTypes.shape({
 				color: PropTypes.string,
+				type: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 			})
@@ -34,19 +35,23 @@ class Focus extends React.Component {
 			<g style={{pointerEvents: "none"}}>
 				{!sticky && (
 					<line
-						stroke="#777"
+						stroke="#777777"
 						strokeDasharray="3,3"
 						x1={xScale(x)} y1={padding.top}
 						x2={xScale(x)} y2={height - padding.bottom}
 					/>
 				)}
-				{ys.map(({color, x, y}, index) => (
-					<circle key={index}
-						r="5"
-						cx={xScale(x)} cy={yScale(y)}
-						fill={color}
-					/>
-				))}
+				{ys
+					.filter(({type}) => type === "Line")
+					.map(({color, x, y}, index) => (
+						<circle key={index}
+							r="4"
+							cx={xScale(x)} cy={yScale(y)}
+							stroke="#ffffff"
+							fill={color}
+						/>
+					))
+				}
 			</g>
 		)
 	}
