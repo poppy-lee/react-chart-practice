@@ -13,7 +13,8 @@ class Bar extends React.Component {
 		type: PropTypes.string,
 		typeIndex: PropTypes.number,
 		typeCount: PropTypes.number,
-		barWidth: PropTypes.number,
+		bandWidth: PropTypes.number,
+		barPadding: PropTypes.number,
 		color: PropTypes.string,
 	}
 
@@ -29,8 +30,11 @@ class Bar extends React.Component {
 	render() {
 		const {
 			xScale, yScale,
-			typeIndex, typeCount, barWidth, color,
+			typeIndex, typeCount, bandWidth, color,
 		} = this.props
+
+		const barPadding = bandWidth * (this.props.barPadding || 0)
+		const barWidth = (bandWidth / typeCount) - 2 * barPadding
 
 		return (
 			<g>
@@ -39,8 +43,9 @@ class Bar extends React.Component {
 					return (
 						<rect key={point.get("x")}
 							fill={color}
-							width={barWidth / typeCount} height={Math.abs(height)}
-							x={xScale(point.get("x")) - barWidth / 2 + barWidth / typeCount * typeIndex}
+							width={barWidth}
+							height={Math.abs(height)}
+							x={(xScale(point.get("x")) - bandWidth / 2) + (bandWidth / typeCount * typeIndex) + barPadding}
 							y={height < 0 ? yScale(point.get("y")) : yScale(0)}
 						/>
 					)

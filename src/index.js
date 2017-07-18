@@ -23,7 +23,7 @@ ReactDOM.render(
 			<XAxis />
 			<Bar pointList={generatePointList(LENGTH)} />
 			<Line pointList={generatePointList(LENGTH)} />
-			<Bar pointList={generatePointList(LENGTH)} />
+			<Bar pointList={generatePointList(LENGTH)} barPadding={0.1} />
 			<Bar pointList={generatePointList(LENGTH)} />
 			<Line pointList={generatePointList(LENGTH)} />
 			<Sensor>

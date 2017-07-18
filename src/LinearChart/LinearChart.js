@@ -55,7 +55,7 @@ class LinearChart extends React.Component {
 					...this.getScales(),
 				})}
 				{this.renderCharts({
-					barWidth: 0.8 * this.getBarWidth(),
+					bandWidth: 0.8 * this.getBandWidth(),
 					...this.getScales(),
 				})}
 				{this.renderSensor({
@@ -125,7 +125,7 @@ class LinearChart extends React.Component {
 		}
 	}
 
-	getBarWidth = () => {
+	getBandWidth = () => {
 		const {width} = this.props
 		const {xScale} = this.getScales()
 		const xs = [...new Set(
