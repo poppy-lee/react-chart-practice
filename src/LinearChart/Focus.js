@@ -11,6 +11,7 @@ class Focus extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
+		sticky: PropTypes.bool,
 		mouseX: PropTypes.number,
 		mouseY: PropTypes.number,
 		x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -25,19 +26,20 @@ class Focus extends React.Component {
 
 	render() {
 		const {
-			width, height, padding,
-			xScale, yScale,
-			x, ys
+			width, height, padding, xScale, yScale,
+			sticky, x, ys
 		} = this.props
 
 		return (
 			<g style={{pointerEvents: "none"}}>
-				<line
-					stroke="#777"
-					strokeDasharray="3,3"
-					x1={xScale(x)} y1={padding.top}
-					x2={xScale(x)} y2={height - padding.bottom}
-				/>
+				{!sticky && (
+					<line
+						stroke="#777"
+						strokeDasharray="3,3"
+						x1={xScale(x)} y1={padding.top}
+						x2={xScale(x)} y2={height - padding.bottom}
+					/>
+				)}
 				{ys.map(({color, x, y}, index) => (
 					<circle key={index}
 						r="5"

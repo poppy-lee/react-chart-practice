@@ -26,7 +26,7 @@ ReactDOM.render(
 			<Bar pointList={generatePointList(LENGTH)} />
 			<Line pointList={generatePointList(LENGTH)} />
 			<Line pointList={generatePointList(LENGTH)} />
-			<Sensor>
+			<Sensor sticky>
 				<Focus />
 				<Tooltip />
 			</Sensor>
@@ -44,9 +44,9 @@ function generatePointList(length) {
 				y: 0.1 < Math.random()
 					? length * Math.random()
 					: null,
-				y: 0.99 < Math.random()
-					? length * Math.random()
-					: null,
+				// y: 0.99 < Math.random()
+				// 	? length * Math.random()
+				// 	: null,
 			})
 		})
 		.filter((point) => Number.isFinite(point.get("y")))

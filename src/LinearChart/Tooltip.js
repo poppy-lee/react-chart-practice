@@ -10,6 +10,7 @@ class Tooltip extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
+		sticky: PropTypes.bool,
 		mouseX: PropTypes.number,
 		mouseY: PropTypes.number,
 		x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -46,7 +47,7 @@ class Tooltip extends React.Component {
 	}
 
 	render() {
-		const {mouseX, mouseY, x, ys} = this.props
+		const {sticky, mouseX, mouseY, x, ys} = this.props
 
 		return (
 			<g ref="tooltip"
@@ -59,18 +60,21 @@ class Tooltip extends React.Component {
 					fill="#ffffff"
 					opacity="0.85"
 				/>
-				<text
-					x="20" y="10"
-					dominantBaseline="hanging"
-				>
-					x: {x}
-				</text>
-				{ys.map(({color, name, y}, index) => (
+				{!sticky && (
+					<text
+						x="20" y="10"
+						dominantBaseline="hanging"
+					>
+						x: {x}
+					</text>
+				)}
+				{ys.map(({color, name, x, y}, index) => (
 					<text key={index}
-						x="20" y={20 * (index + 1) + 10}
+						x="20" y={20 * (index + (!sticky ? 1 : 0)) + 10}
 						dominantBaseline="hanging"
 						fill={color}
 					>
+						{sticky && `x${index + 1}: ${x}, `}
 						{name}: {y}
 					</text>
 				))}

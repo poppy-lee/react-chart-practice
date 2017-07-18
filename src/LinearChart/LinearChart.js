@@ -35,7 +35,7 @@ class LinearChart extends React.Component {
 				name: `y${index + 1}`,
 				...props,
 				pointList: (props.pointList || Immutable.List())
-					.sort((pointA, pointB) => pointA.get("x") - pointB.get("x")),
+					.sort(sortPoint),
 			}))
 	}
 
@@ -88,7 +88,7 @@ class LinearChart extends React.Component {
 					color: this.props.colorArray[index % this.props.colorArray.length]
 				}, props, child.props, {
 					pointList: child.props.pointList
-						.sort((pointA, pointB) => pointA.get("x") - pointB.get("x"))
+						.sort(sortPoint)
 						.filter((point, index) => {
 							return !(index % Math.round(child.props.pointList.size / (chartWidth * this.pixelRatio)))
 						})
@@ -186,21 +186,24 @@ class LinearChart extends React.Component {
 			.filter((point) => point && Number.isFinite(point.y))
 
 		return {
-			xs: [...new Set(points.map(({x}) => x || 0))]
-				.sort((a, b) => {
-					if (a > b) return 1
-					if (a < b) return -1
-					return 0
-				}),
-			ys: [...new Set(points.map(({y}) => y || 0))]
-				.sort((a, b) => {
-					if (a > b) return 1
-					if (a < b) return -1
-					return 0
-				}),
+			xs: [...new Set(points.map(({x}) => x || 0))].sort(sort),
+			ys: [...new Set(points.map(({y}) => y || 0))].sort(sort),
 		}
 	}
 
 }
 
 export default LinearChart
+
+
+function sort(a, b) {
+	if (a > b) return 1
+	if (a < b) return -1
+	return 0
+}
+
+function sortPoint(pointA, pointB) {
+	if (pointA.get("x") > pointB.get("x")) return 1
+	if (pointA.get("x") < pointB.get("x")) return -1
+	return 0
+}
