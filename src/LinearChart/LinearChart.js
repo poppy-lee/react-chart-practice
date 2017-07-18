@@ -55,7 +55,7 @@ class LinearChart extends React.Component {
 					...this.getScales(),
 				})}
 				{this.renderCharts({
-					barWidth: this.getBarWidth(),
+					barWidth: 0.8 * this.getBarWidth(),
 					...this.getScales(),
 				})}
 				{this.renderSensor({

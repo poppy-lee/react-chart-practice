@@ -25,6 +25,7 @@ ReactDOM.render(
 			<Line pointList={generatePointList(LENGTH)} />
 			<Bar pointList={generatePointList(LENGTH)} />
 			<Bar pointList={generatePointList(LENGTH)} />
+			<Line pointList={generatePointList(LENGTH)} />
 			<Sensor>
 				<Focus />
 				<Tooltip />
