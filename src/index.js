@@ -2,14 +2,13 @@ import Immutable from "immutable"
 import React from "react"
 import ReactDOM from "react-dom"
 
-import LinearChart from "./LinearChart/LinearChart"
-import YAxis from "./LinearChart/YAxis"
-import XAxis from "./LinearChart/XAxis"
-import Line from "./LinearChart/Line"
-import Bar from "./LinearChart/Bar"
-import Sensor from "./LinearChart/Sensor"
-import Focus from "./LinearChart/Focus"
-import Tooltip from "./LinearChart/Tooltip"
+import {
+	LinearChart,
+		XAxis, YAxis,
+		Bar, Line,
+		Sensor,
+			Focus, Tooltip
+} from "./LinearChart"
 
 const LENGTH = 20
 
