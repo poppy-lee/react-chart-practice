@@ -20,6 +20,7 @@ class Sensor extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 		xs: PropTypes.array,
+		ys: PropTypes.array,
 		chartProps: PropTypes.array,
 	}
 
@@ -111,7 +112,7 @@ function findPoint(pointList, x, closestPoint, leftIdx, rightIdx) {
 	rightIdx = Number.isFinite(rightIdx) ?  rightIdx : pointList.size - 1
 
 	const midIdx = Math.floor((rightIdx + leftIdx) / 2)
-	const point = pointList.get(midIdx)
+	const point = pointList.get(midIdx) || Immutable.Map()
 
 	if (point.get("x") === x) return point
 

@@ -34,6 +34,8 @@ class LinearChart extends React.Component {
 				color: colorArray[index % colorArray.length],
 				name: `y${index + 1}`,
 				...props,
+				pointList: (props.pointList || Immutable.List())
+					.sort((pointA, pointB) => pointA.get("x") - pointB.get("x")),
 			}))
 	}
 
@@ -86,6 +88,7 @@ class LinearChart extends React.Component {
 					color: this.props.colorArray[index % this.props.colorArray.length]
 				}, props, child.props, {
 					pointList: child.props.pointList
+						.sort((pointA, pointB) => pointA.get("x") - pointB.get("x"))
 						.filter((point, index) => {
 							return !(index % Math.round(child.props.pointList.size / (chartWidth * this.pixelRatio)))
 						})
@@ -121,15 +124,26 @@ class LinearChart extends React.Component {
 	getBarWidth = () => {
 		const {width} = this.props
 		const {xScale} = this.getScales()
-		const {xs} = this.getXYs()
+		const xs = [...new Set(
+			this.getChartProps()
+			.filter(({type}) => type === "Bar")
+			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
+			.filter((point) => point && Number.isFinite(point.y))
+			.map(({x}) => x || 0)
+		)]
 
+		const minX = Math.min(...xs)
 		const maxX = Math.max(...xs)
 		const interval = Math.min(...xs
-			.map((x, index, xs) => x - (xs[index - 1] || 0))
+			.map((x, index, xs) => Math.abs(x - (xs[index - 1]) || 0))
 			.filter((interval) => interval)
 		)
 
-		return Math.max(1 / (this.pixelRatio), xScale(maxX) - xScale(maxX - interval))
+		return Math.max(1 / (this.pixelRatio), Math.min(...[
+			Math.abs(xScale(maxX) - xScale(maxX - interval)),
+			2 * Math.abs(xScale(minX) - xScale.range()[0]),
+			2 * Math.abs(xScale(maxX) - xScale.range()[1]),
+		]))
 	}
 
 	getScales = () => {

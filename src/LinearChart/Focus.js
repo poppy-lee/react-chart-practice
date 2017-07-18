@@ -38,7 +38,7 @@ class Focus extends React.Component {
 					x1={xScale(x)} y1={padding.top}
 					x2={xScale(x)} y2={height - padding.bottom}
 				/>
-				{ys.map(({color, y}, index) => (
+				{ys.map(({color, x, y}, index) => (
 					<circle key={index}
 						r="5"
 						cx={xScale(x)} cy={yScale(y)}
