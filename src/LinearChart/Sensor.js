@@ -25,15 +25,9 @@ class Sensor extends React.Component {
 
 	state = initialState
 
-	getClosestElement = (iteratable = [], targetValue = 0) => {
-		return iteratable.reduce((closest, current) => {
-			return Math.abs(current - targetValue) < Math.abs(closest - targetValue) ? current : closest
-		})
-	}
-
 	getX = (mouseX) => {
 		const {xScale, xs} = this.props
-		return this.getClosestElement(xs, +xScale.invert(mouseX))
+		return find(xs, +xScale.invert(mouseX))
 	}
 
 	getYs = (mouseX) => {
@@ -42,8 +36,7 @@ class Sensor extends React.Component {
 
 		return chartProps
 			.map((props, index) => {
-				const pointList = props.pointList || Immutable.List()
-				const point = pointList.find((point) => Immutable.Map(point).get("x") === x)
+				const point = findPoint(props.pointList || Immutable.List(), x)
 				return {...props, ...Immutable.Map(point).toObject()}
 			})
 			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
@@ -95,3 +88,35 @@ class Sensor extends React.Component {
 }
 
 export default Sensor
+
+function find(array, target, closest, leftIdx, rightIdx) {
+	closest = Number.isFinite(closest) ? closest : -Infinity
+	leftIdx = Number.isFinite(leftIdx) ? leftIdx : 0
+	rightIdx = Number.isFinite(rightIdx) ?  rightIdx : array.length - 1
+
+	const midIdx = Math.floor((rightIdx + leftIdx) / 2)
+	const current = array[midIdx]
+
+	if (current === target) return current
+
+	closest = Math.abs(target - current) <= Math.abs(target - closest) ? current : closest
+	if (leftIdx >= rightIdx) return closest
+	if (current < target) return find(array, target, closest, midIdx + 1, rightIdx)
+	if (current > target) return find(array, target, closest, leftIdx, midIdx)
+}
+
+function findPoint(pointList, x, closestPoint, leftIdx, rightIdx) {
+	closestPoint = closestPoint || Immutable.Map({index: -1, x: -Infinity})
+	leftIdx = Number.isFinite(leftIdx) ? leftIdx : 0
+	rightIdx = Number.isFinite(rightIdx) ?  rightIdx : pointList.size - 1
+
+	const midIdx = Math.floor((rightIdx + leftIdx) / 2)
+	const point = pointList.get(midIdx)
+
+	if (point.get("x") === x) return point
+
+	closestPoint = Math.abs(x - point.get("x")) <= Math.abs(x - closestPoint.get("x")) ? point : closestPoint
+	if (leftIdx >= rightIdx) return closestPoint
+	if (point.get("x") < x) return findPoint(pointList, x, closestPoint, midIdx + 1, rightIdx)
+	if (point.get("x") > x) return findPoint(pointList, x, closestPoint, leftIdx, midIdx)
+}

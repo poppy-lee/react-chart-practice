@@ -23,7 +23,7 @@ class LinearChart extends React.Component {
 		colorArray: d3.schemeCategory10,
 	}
 
-	pixelRatio = 2 * (window.devicePixelRatio || 1)
+	pixelRatio = (window.devicePixelRatio || 1)
 
 	getChartProps = (children = this.props.children) => {
 		const {colorArray} = this.props

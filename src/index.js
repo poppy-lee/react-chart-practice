@@ -11,7 +11,7 @@ import Sensor from "./LinearChart/Sensor"
 import Focus from "./LinearChart/Focus"
 import Tooltip from "./LinearChart/Tooltip"
 
-const LENGTH = 50000
+const LENGTH = 65535
 
 const width = 700
 const height = 360
@@ -22,8 +22,8 @@ ReactDOM.render(
 		<LinearChart width={width} height={height} padding={padding}>
 			<YAxis />
 			<XAxis />
-			<Line pointList={generatePointList(LENGTH)} lineWidth={0.25} />
-			<Line pointList={generatePointList(LENGTH)} lineWidth={0.25} />
+			<Line pointList={generatePointList(LENGTH)} />
+			<Line pointList={generatePointList(LENGTH)} />
 			<Bar pointList={generatePointList(LENGTH)} />
 			<Bar pointList={generatePointList(LENGTH)} />
 			<Sensor>
@@ -47,4 +47,3 @@ function generatePointList(length) {
 		})
 		.filter((point) => Number.isFinite(point.get("y")))
 }
-

@@ -22,7 +22,15 @@ class Tooltip extends React.Component {
 		),
 	}
 
+	componentDidMount() {
+		this.updateTooltipBg()
+	}
+
 	componentDidUpdate() {
+		this.updateTooltipBg()
+	}
+
+	updateTooltipBg = () => {
 		const tooltip = this.refs["tooltip"]
 		const tooltipBg = this.refs["tooltip-bg"]
 
