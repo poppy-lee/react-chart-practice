@@ -44,7 +44,7 @@ function generatePointList(length) {
 				y: 0.1 < Math.random()
 					? length * Math.random()
 					: null,
-				y: 0.95 < Math.random()
+				y: 0.99 < Math.random()
 					? length * Math.random()
 					: null,
 			})

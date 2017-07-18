@@ -73,7 +73,7 @@ class Sensor extends React.Component {
 
 	shouldRenderChildComponents = () => {
 		const {mouseX, mouseY, ys} = this.state
-		return Number.isFinite(mouseX + mouseY) && ys
+		return Number.isFinite(mouseX + mouseY) && ys && ys.length
 	}
 
 	renderChildComponents = (props) => {
