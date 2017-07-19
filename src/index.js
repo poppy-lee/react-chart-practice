@@ -21,11 +21,15 @@ ReactDOM.render(
 		<LinearChart width={width} height={height} padding={padding}>
 			<YAxis />
 			<XAxis />
+			{[
+				generatePointList(LENGTH), generatePointList(LENGTH),
+				generatePointList(LENGTH), generatePointList(LENGTH),
+			].map((pointList, index) => {
+				const Component = index % 2 ? Line : Bar
+				return <Component key={index} pointList={pointList} />
+			})}
 			<Line pointList={generatePointList(LENGTH)} />
 			<Bar pointList={generatePointList(LENGTH)} />
-			<Line pointList={generatePointList(LENGTH)} />
-			<Bar pointList={generatePointList(LENGTH)} />
-			<Line pointList={generatePointList(LENGTH)} />
 			<Sensor>
 				<Focus />
 				<Tooltip />
