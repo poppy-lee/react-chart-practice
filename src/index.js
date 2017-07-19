@@ -10,7 +10,7 @@ import {
 			Focus, Tooltip
 } from "./LinearChart"
 
-const LENGTH = 10000
+const LENGTH = 30
 
 const width = 700
 const height = 360
@@ -26,15 +26,6 @@ ReactDOM.render(
 			<Line pointList={generatePointList(LENGTH)} />
 			<Bar pointList={generatePointList(LENGTH)} />
 			<Line pointList={generatePointList(LENGTH)} />
-			<Bar pointList={generatePointList(LENGTH)} />
-			<Line pointList={generatePointList(LENGTH)} />
-			<Bar pointList={generatePointList(LENGTH)} />
-			<Line pointList={generatePointList(LENGTH)} />
-			<Bar pointList={generatePointList(LENGTH)} />
-			<Line pointList={generatePointList(LENGTH)} />
-			<Bar pointList={generatePointList(LENGTH)} />
-			<Line pointList={generatePointList(LENGTH)} />
-			<Bar pointList={generatePointList(LENGTH)} />
 			<Sensor>
 				<Focus />
 				<Tooltip />
@@ -49,16 +40,9 @@ function generatePointList(length) {
 		.map((undef, index) => {
 			return Immutable.Map({
 				x: index,
-				// x: length * Math.random(),
-				y: 0.5 < Math.random()
+				y: 0.01 < Math.random()
 					? length * Math.random()
 					: 0.5 < Math.random() ? 0 : null,
-				// y: 0.99 < Math.random()
-				// 	? length * Math.random()
-				// 	: null,
-				y: 0.001 < Math.random()
-					? index % 10000
-					: null,
 			})
 		})
 		.filter((point = Immutable.Map()) => {

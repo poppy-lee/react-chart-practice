@@ -38,7 +38,7 @@ class LinearChart extends React.Component {
 					...this.getScales(),
 				})}
 				{this.renderCharts({
-					bandWidth: 0.8 * this.getBandWidth(),
+					bandWidth: this.getBandWidth(),
 					...this.getScales(),
 				})}
 				{this.renderSensor({
@@ -160,7 +160,7 @@ class LinearChart extends React.Component {
 			.map((x, index, xs) => Math.abs(x - (xs[index - 1]) || 0))
 			.filter((interval) => interval)
 
-		return Math.max(1 / this.pixelRatio, Math.min(...[
+		return Math.max(1 / this.pixelRatio, 0.8 * Math.min(...[
 			Math.abs(xScale(max) - xScale(max - Math.min(...intervals))),
 			2 * Math.abs(xScale(min) - xScale.range()[0]),
 			2 * Math.abs(xScale(max) - xScale.range()[1]),
