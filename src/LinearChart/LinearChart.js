@@ -25,23 +25,6 @@ class LinearChart extends React.Component {
 
 	pixelRatio = (window.devicePixelRatio || 1)
 
-	getChartProps = (children = this.props.children) => {
-		const {colorArray} = this.props
-		const typeCounts = {}
-		return [].concat(children || [])
-			.filter(({props = {}}) => props.pointList)
-			.map(({type = () => null, props = {}}, index) => {
-				if (!typeCounts[type.name]) typeCounts[type.name] = 0
-				return {
-					index, type: type.name, typeIndex: typeCounts[type.name]++,
-					color: colorArray[index % colorArray.length],
-					name: `y${index + 1}`,
-					...props,
-					pointList: props.pointList.sort(sortPoint),
-				}
-			})
-	}
-
   render() {
 		const {width, height} = this.props
 
@@ -76,36 +59,71 @@ class LinearChart extends React.Component {
 				return <child.type key={`axis-${index}`} {...{...props, ...child.props}} />
 			})
 	}
-
 	renderCharts = (props) => {
-		const {width} = this.props
-		const {colorArray} = this.props
-
-		const padding = this.getPadding()
-
-		const chartWidth = width - (padding.left + padding.right)
-		const chartPixels = chartWidth * this.pixelRatio
 		const chartProps = this.getChartProps()
-
+		const filtertedPointLists = this.getPointLists(true)
 		return [].concat(this.props.children || [])
 			.filter(({props = {}}) => props.pointList)
 			.map((child, index) => {
 				child = child || {type: () => null, props: {}}
 				return <child.type key={`chart-${index}`} {...{
 					...chartProps[index], ...props, ...child.props,
-					typeCount: Math.max(...chartProps.map(({type, typeIndex}) => type === child.type.name && typeIndex + 1)),
-					pointList: child.props.pointList.sort(sortPoint)
-						.filter((point, index) => !(index % Math.round(child.props.pointList.size / chartPixels)))
+					pointList: filtertedPointLists[index],
 				}} />
 			})
 	}
-
 	renderSensor = (props) => {
 		return [].concat(this.props.children || [])
 			.filter(({type}) => ["Sensor"].includes(type.name))
 			.map((child, index) => {
 				child = child || {type: () => null, props: {}}
 				return <child.type key={`sensor-${index}`} {...{...props, ...child.props}} />
+			})
+	}
+
+	getChartProps = (children = this.props.children) => {
+		const {colorArray} = this.props
+		const pointLists = this.getPointLists()
+		const typeCounts = {}
+		return [].concat(children || [])
+			.filter(({props = {}}) => props.pointList)
+			.map(({type = () => null, props = {}}, index) => ({
+				name: `y${index + 1}`,
+				color: colorArray[index % colorArray.length],
+				...props,
+				pointList: pointLists[index],
+				chartIndex: index,
+				type: type.name,
+				typeIndex: (typeCounts[type.name] = (typeCounts[type.name] || 0) + 1) - 1,
+			}))
+			.map((props) => ({
+				...props,
+				typeCount: typeCounts[props.type],
+			}))
+	}
+
+	getPointLists = (filter = false) => {
+		const {width} = this.props
+		const padding = this.getPadding()
+
+		const chartWidth = width - (padding.left + padding.right)
+		const chartPixels = chartWidth * this.pixelRatio
+
+		return [].concat(this.props.children || [])
+			.filter(({props = {}}) => props.pointList)
+			.map(({props = {}}, index) => {
+				return props.pointList
+					.sort((pointA, pointB) => {
+						if (pointA.get("x") > pointB.get("x")) return 1
+						if (pointA.get("x") < pointB.get("x")) return -1
+						return 0
+					})
+					.filter((point, index, pointList) => !(
+						filter
+						&& point && point.get("y") !== null // show null
+						&& index !== pointList.size - 1     // show last
+						&& index % Math.round(props.pointList.size / chartPixels)
+					))
 			})
 	}
 
@@ -130,23 +148,22 @@ class LinearChart extends React.Component {
 		const {xScale} = this.getScales()
 		const xs = [...new Set(
 			this.getChartProps()
-			.filter(({type}) => type === "Bar")
-			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
-			.filter((point) => point && Number.isFinite(point.y))
-			.map(({x}) => x || 0)
+				.filter(({type}) => type === "Bar")
+				.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
+				.filter((point) => point && Number.isFinite(point.y))
+				.map(({x}) => x || 0)
 		)]
 
-		const minX = Math.min(...xs)
-		const maxX = Math.max(...xs)
-		const interval = Math.min(...xs
+		const min = Math.min(...xs)
+		const max = Math.max(...xs)
+		const intervals = xs
 			.map((x, index, xs) => Math.abs(x - (xs[index - 1]) || 0))
 			.filter((interval) => interval)
-		)
 
 		return Math.max(1 / this.pixelRatio, Math.min(...[
-			Math.abs(xScale(maxX) - xScale(maxX - interval)),
-			2 * Math.abs(xScale(minX) - xScale.range()[0]),
-			2 * Math.abs(xScale(maxX) - xScale.range()[1]),
+			Math.abs(xScale(max) - xScale(max - Math.min(...intervals))),
+			2 * Math.abs(xScale(min) - xScale.range()[0]),
+			2 * Math.abs(xScale(max) - xScale.range()[1]),
 		]))
 	}
 
@@ -169,25 +186,29 @@ class LinearChart extends React.Component {
 
 	getDomains = () => {
 		const {xs, ys} = this.getXYs()
-
-		const xInterval = Math.min(...xs
+		const xIntervals = xs
 			.map((x, index, xs) => x - (xs[index - 1] || 0))
 			.filter((interval) => interval)
-		)
 
 		return {
 			xDomain: [
-				Math.min(...xs) - xInterval / 2,
-				Math.max(...xs) + xInterval / 2,
+				Math.min(...xs) - Math.min(...xIntervals) / 2,
+				Math.max(...xs) + Math.min(...xIntervals) / 2,
 			],
 			yDomain: d3.extent([0, ...ys]),
 		}
 	}
 
 	getXYs = () => {
-		const points = this.getChartProps()
-			.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
+		const points = this.getPointLists()
+			.reduce((points, pointList = Immutable.List()) => points.concat(pointList.toJS()), [])
 			.filter((point) => point && Number.isFinite(point.y))
+
+		const sort = (a, b) => {
+			if (a > b) return 1
+			if (a < b) return -1
+			return 0
+		}
 
 		return {
 			xs: [...new Set(points.map(({x}) => x || 0))].sort(sort),
@@ -198,16 +219,3 @@ class LinearChart extends React.Component {
 }
 
 export default LinearChart
-
-
-function sort(a, b) {
-	if (a > b) return 1
-	if (a < b) return -1
-	return 0
-}
-
-function sortPoint(pointA, pointB) {
-	if (pointA.get("x") > pointB.get("x")) return 1
-	if (pointA.get("x") < pointB.get("x")) return -1
-	return 0
-}

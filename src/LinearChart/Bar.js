@@ -8,14 +8,16 @@ class Bar extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
-		index: PropTypes.number,
-		pointList: ImmutablePropTypes.list.isRequired,
+		chartIndex: PropTypes.number,
 		type: PropTypes.string,
 		typeIndex: PropTypes.number,
 		typeCount: PropTypes.number,
 		bandWidth: PropTypes.number,
-		barPadding: PropTypes.number,
+		pointList: ImmutablePropTypes.list.isRequired,
+
+		name: PropTypes.string,
 		color: PropTypes.string,
+		barPadding: PropTypes.number,
 	}
 
 	getPointList = () => {

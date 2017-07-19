@@ -11,13 +11,16 @@ class Line extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
-		index: PropTypes.number,
-		pointList: ImmutablePropTypes.list.isRequired,
+		chartIndex: PropTypes.number,
 		type: PropTypes.string,
 		typeIndex: PropTypes.number,
 		typeCount: PropTypes.number,
-		lineWidth: PropTypes.number,
+		bandWidth: PropTypes.number,
+		pointList: ImmutablePropTypes.list.isRequired,
+
+		name: PropTypes.string,
 		color: PropTypes.string,
+		lineWidth: PropTypes.number,
 	}
 
 	static defaultProps = {
@@ -56,9 +59,13 @@ class Line extends React.Component {
 		} = this.props
 
 		return this.getPointList()
-			.filter((point, index, pointList) => {
-				return point.get("y") && !(index && pointList.getIn([index - 1, "y"]) && pointList.getIn([index + 1, "y"]))
-			})
+			.filter((point, index, pointList) => (
+				Number.isFinite(point.get("y")) && !(
+					index
+					&& Number.isFinite(pointList.getIn([index - 1, "y"]))
+					&& Number.isFinite(pointList.getIn([index + 1, "y"]))
+				)
+			))
 			.map((point, index) => (
 				<circle key={index}
 					fill={color}
@@ -73,7 +80,7 @@ class Line extends React.Component {
 		const {xScale, yScale} = this.props
 		return (
 			d3.line()
-				.defined((point) => point && point.y)
+				.defined((point) => point && Number.isFinite(point.y))
 				.x(({x}) => xScale(x))
 				.y(({y}) => yScale(y))
 		) (pointList.toJS())

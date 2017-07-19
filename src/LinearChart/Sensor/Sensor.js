@@ -37,14 +37,16 @@ class Sensor extends React.Component {
 		const {chartProps} = this.props
 		const x = this.getX(mouseX)
 
-		return chartProps
-			.map((props, index) => {
-				const point = this.props.sticky
-					? findClosestPoint(props.pointList || Immutable.List(), x)
-					: findPoint(props.pointList || Immutable.List(), x)
-				return {...props, ...Immutable.Map(point).toObject()}
-			})
-			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
+		return this.state.x !== x
+			? chartProps
+				.map((props, index) => {
+					const point = this.props.sticky
+						? findClosestPoint(props.pointList || Immutable.List(), x)
+						: findPoint(props.pointList || Immutable.List(), x)
+					return {...props, ...Immutable.Map(point).toObject()}
+				})
+				.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
+			: this.state.ys
 	}
 
 	onMouseEvent = ({clientX, clientY}) => {
