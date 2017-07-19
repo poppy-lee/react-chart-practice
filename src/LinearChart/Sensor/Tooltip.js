@@ -36,8 +36,8 @@ class Tooltip extends React.Component {
 		const tooltip = this.refs["tooltip"]
 		const tooltipBg = this.refs["tooltip-bg"]
 
-		tooltipBg.removeAttribute("width", 0)
-		tooltipBg.removeAttribute("height", 0)
+		tooltipBg.setAttribute("width", 0)
+		tooltipBg.setAttribute("height", 0)
 
 		const {top, right, bottom, left} = tooltip.getBoundingClientRect()
 		const width = right - left + 20
@@ -63,14 +63,14 @@ class Tooltip extends React.Component {
 				/>
 				<text
 					x="20" y="10"
-					dominantBaseline="hanging"
+					dominantBaseline="text-before-edge"
 				>
 					{sticky ? "sticky" : `x: ${x}`}
 				</text>
 				{ys.map(({color, name, x, y}, index) => (
 					<text key={index}
 						x="20" y={20 * (index + 1) + 10}
-						dominantBaseline="hanging"
+						dominantBaseline="text-before-edge"
 						fill={color}
 					>
 						{sticky && `x${index + 1}: ${x}, `}

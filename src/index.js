@@ -10,7 +10,7 @@ import {
 			Focus, Tooltip
 } from "./LinearChart"
 
-const LENGTH = 20000
+const LENGTH = 10000
 
 const width = 700
 const height = 360
@@ -26,6 +26,15 @@ ReactDOM.render(
 			<Line pointList={generatePointList(LENGTH)} />
 			<Bar pointList={generatePointList(LENGTH)} />
 			<Line pointList={generatePointList(LENGTH)} />
+			<Bar pointList={generatePointList(LENGTH)} />
+			<Line pointList={generatePointList(LENGTH)} />
+			<Bar pointList={generatePointList(LENGTH)} />
+			<Line pointList={generatePointList(LENGTH)} />
+			<Bar pointList={generatePointList(LENGTH)} />
+			<Line pointList={generatePointList(LENGTH)} />
+			<Bar pointList={generatePointList(LENGTH)} />
+			<Line pointList={generatePointList(LENGTH)} />
+			<Bar pointList={generatePointList(LENGTH)} />
 			<Sensor>
 				<Focus />
 				<Tooltip />
@@ -47,8 +56,8 @@ function generatePointList(length) {
 				// y: 0.99 < Math.random()
 				// 	? length * Math.random()
 				// 	: null,
-				y: 0.01 < Math.random()
-					? index % 1000
+				y: 0.001 < Math.random()
+					? index % 10000
 					: null,
 			})
 		})
