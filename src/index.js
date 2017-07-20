@@ -10,7 +10,7 @@ import {
 			Focus, Tooltip
 } from "./LinearChart"
 
-const LENGTH = 1000
+const LENGTH = 10
 
 const width = 700
 const height = 360
@@ -27,16 +27,14 @@ ReactDOM.render(
 		>
 			<YAxis />
 			<XAxis />
-			{[
-				generatePointList(LENGTH), generatePointList(LENGTH),
-				generatePointList(LENGTH), generatePointList(LENGTH),
-			].map((pointList, index) => {
-				const Component = index % 2 ? Line : Bar
-				const name = index % 2 ? "가나다라마바사아자차카타파하" : "abcdefghijklmnopqrstuwxyz"
-				return <Component key={index} name={name} pointList={pointList} />
-			})}
-			<Line pointList={generatePointList(LENGTH)} />
-			<Bar pointList={generatePointList(LENGTH)} />
+			{[...Array(4)]
+				.map(() => generatePointList(LENGTH))
+				.map((pointList, index) => {
+					const Component = index % 2 ? Line : Bar
+					const name = index % 2 ? "Line" : "Bar"
+					return <Component key={index} name={name} pointList={pointList} />
+				})
+			}
 			<Sensor>
 				<Focus />
 				<Tooltip />
@@ -54,11 +52,9 @@ function generatePointList(length) {
 				y: 0.01 < Math.random()
 					? Math.random() * 5000
 					: 0.5 < Math.random() ? 0 : null,
-				y: null,
 			})
 		})
 		.filter((point = Immutable.Map()) => {
-			// allow null and number
 			return !point.isEmpty() && isFinite(point.get("y"))
 		})
 }

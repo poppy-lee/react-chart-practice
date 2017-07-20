@@ -63,18 +63,19 @@ class LinearChart extends React.Component {
 			})
 	}
 	renderCharts = (props) => {
-		const chartProps = this.getChartProps()
 		const filtertedPointLists = this.getPointLists(true)
+		const chartProps = this.getChartProps()
 		return this.getChildren()
 			.filter(({props = {}}) => props.pointList)
-			.map((child, index) => {
-				child = child || {type: () => null, props: {}}
-				return (
-					<child.type key={`chart-${index}`} {...{
-						...chartProps[index], ...props, ...child.props,
-						pointList: filtertedPointLists[index],
-					}} />
-				)
+			.map((child, index) => (
+				<child.type key={`chart-${index}`} {...{
+					...chartProps[index], ...props, ...(child.props || {}),
+					pointList: filtertedPointLists[index],
+				}} />
+			))
+			.sort(({type: typeA}, {type: typeB}) => {
+				const typeOrder = ["Bar", "Line"]
+				return typeOrder.indexOf(typeA.name) - typeOrder.indexOf(typeB.name)
 			})
 	}
 	renderSensor = (props) => {
@@ -178,7 +179,7 @@ class LinearChart extends React.Component {
 			2 * Math.abs(xScale(max) - xScale.range()[1]),
 		))
 
-		return bandWidth
+		return 0.8 * bandWidth
 	}
 
 	getScales = () => {
