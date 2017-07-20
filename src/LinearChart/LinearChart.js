@@ -1,9 +1,12 @@
+import "./LinearChart.css"
+
 import * as d3 from "d3"
 
 import Immutable from "immutable"
 import PropTypes from "prop-types"
 import React from "react"
 
+export default
 class LinearChart extends React.Component {
 
 	static propTypes = {
@@ -29,7 +32,10 @@ class LinearChart extends React.Component {
 		const {width, height} = this.props
 
     return (
-			<svg width={String(width)} height={String(height)}>
+			<svg
+				className="linear-chart"
+				width={String(width)} height={String(height)}
+			>
 				{this.renderAxes({
 					width, height, padding: this.getPadding(),
 					...this.getScales(),
@@ -83,6 +89,7 @@ class LinearChart extends React.Component {
 	getChildren = () => {
 		return [].concat(this.props.children)
 			.reduce((children, child) => children.concat(child), [])
+			.filter((child) => child)
 	}
 
 	getChartProps = () => {
@@ -125,9 +132,9 @@ class LinearChart extends React.Component {
 					})
 					.filter((point, index, pointList) => !(
 						filter
-						&& point && point.get("y") !== null // show null
-						&& index !== pointList.size - 1     // show last
-						&& index % Math.round(props.pointList.size / chartPixels)
+						&& point && point.get("y") !== null      // do not filter null point
+						&& index && index !== pointList.size - 1 // do not filter first and last point
+						&& Math.floor(Math.random() * (props.pointList.size / chartPixels))
 					))
 			})
 	}
@@ -222,5 +229,3 @@ class LinearChart extends React.Component {
 	}
 
 }
-
-export default LinearChart

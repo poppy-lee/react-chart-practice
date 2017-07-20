@@ -1,0 +1,17 @@
+
+.linear-chart text {
+	font-family: sans-serif;
+}
+
+.linear-chart > .axis text {
+	font-size: 10px;
+	fill: #777777;
+}
+.linear-chart > .axis.axis-x text {
+	text-anchor: middle;
+	dominant-baseline: hanging;
+}
+.linear-chart > .axis.axis-y text {
+	text-anchor: end;
+	dominant-baseline: middle;
+}

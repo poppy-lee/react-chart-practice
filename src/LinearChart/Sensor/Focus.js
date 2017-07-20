@@ -2,6 +2,7 @@ import ImmutablePropTypes from "react-immutable-proptypes"
 import PropTypes from "prop-types"
 import React from "react"
 
+export default
 class Focus extends React.Component {
 
 	static propTypes = {
@@ -57,5 +58,3 @@ class Focus extends React.Component {
 	}
 
 }
-
-export default Focus

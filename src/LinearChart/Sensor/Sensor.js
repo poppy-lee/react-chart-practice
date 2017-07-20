@@ -11,6 +11,7 @@ const initialState = {
 	ys: undefined,
 }
 
+export default
 class Sensor extends React.Component {
 
 	static propTypes = {
@@ -37,16 +38,14 @@ class Sensor extends React.Component {
 		const {chartProps} = this.props
 		const x = this.getX(mouseX)
 
-		return this.state.x !== x
-			? chartProps
-				.map((props, index) => {
-					const point = this.props.sticky
-						? findClosestPoint(props.pointList || Immutable.List(), x)
-						: findPoint(props.pointList || Immutable.List(), x)
-					return {...props, ...Immutable.Map(point).toObject()}
-				})
-				.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
-			: this.state.ys
+		return chartProps
+			.map((props, index) => {
+				const point = this.props.sticky
+					? findClosestPoint(props.pointList || Immutable.List(), x)
+					: findPoint(props.pointList || Immutable.List(), x)
+				return {...props, ...Immutable.Map(point).toObject()}
+			})
+			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
 	}
 
 	onMouseEvent = ({clientX, clientY}) => {
@@ -94,8 +93,6 @@ class Sensor extends React.Component {
 
 }
 
-export default Sensor
-
 function findClosest(array, target, closest, leftIdx, rightIdx) {
 	closest = Number.isFinite(closest) ? closest : -Infinity
 	leftIdx = Number.isFinite(leftIdx) ? leftIdx : 0
@@ -104,9 +101,8 @@ function findClosest(array, target, closest, leftIdx, rightIdx) {
 	const midIdx = Math.floor((rightIdx + leftIdx) / 2)
 	const current = array[midIdx]
 
-	if (current === target) return current
-
 	closest = Math.abs(target - current) <= Math.abs(target - closest) ? current : closest
+	if (current === target) return current
 	if (leftIdx >= rightIdx) return closest
 	if (current < target) return findClosest(array, target, closest, midIdx + 1, rightIdx)
 	if (current > target) return findClosest(array, target, closest, leftIdx, midIdx)
@@ -133,9 +129,8 @@ function findClosestPoint(pointList, x, closestPoint, leftIdx, rightIdx) {
 	const midIdx = Math.floor((rightIdx + leftIdx) / 2)
 	const point = pointList.get(midIdx) || Immutable.Map()
 
-	if (point.get("x") === x) return point
-
 	closestPoint = Math.abs(x - point.get("x")) <= Math.abs(x - closestPoint.get("x")) ? point : closestPoint
+	if (point.get("x") === x) return point
 	if (leftIdx >= rightIdx) return closestPoint
 	if (point.get("x") < x) return findClosestPoint(pointList, x, closestPoint, midIdx + 1, rightIdx)
 	if (point.get("x") > x) return findClosestPoint(pointList, x, closestPoint, leftIdx, midIdx)

@@ -1,6 +1,18 @@
+import "./Tooltip.css"
+
 import PropTypes from "prop-types"
 import React from "react"
 
+import numeral from "numeral"
+
+function format(number) {
+	switch (typeof number) {
+		case "number":
+			return numeral(number).format("0,0.[00]")
+	}
+}
+
+export default
 class Tooltip extends React.Component {
 
 	static propTypes = {
@@ -25,62 +37,72 @@ class Tooltip extends React.Component {
 	}
 
 	componentDidMount() {
-		this.updateTooltipBg()
+		this.updateTooltipPosition()
 	}
 
 	componentDidUpdate() {
-		this.updateTooltipBg()
-	}
-
-	updateTooltipBg = () => {
-		const tooltip = this.refs["tooltip"]
-		const tooltipBg = this.refs["tooltip-bg"]
-
-		tooltipBg.setAttribute("width", 0)
-		tooltipBg.setAttribute("height", 0)
-
-		const {top, right, bottom, left} = tooltip.getBoundingClientRect()
-		const width = right - left + 20
-		const height = bottom - top + 20
-
-		tooltipBg.setAttribute("width", width)
-		tooltipBg.setAttribute("height", height)
+		this.updateTooltipPosition()
 	}
 
 	render() {
-		const {sticky, mouseX, mouseY, x, ys} = this.props
+		const {sticky, x, ys} = this.props
+
+		const tooltipPadding = 10
+		const lineHeight = 18
 
 		return (
-			<g ref="tooltip"
-				transform={`translate(${mouseX}, ${mouseY})`}
-				style={{pointerEvents: "none"}}
-			>
-				<rect ref="tooltip-bg"
-					x="10" y="0"
-					rx="5" ry="5"
-					fill="#ffffff"
-					opacity="0.85"
-				/>
-				<text
-					x="20" y="10"
-					dominantBaseline="text-before-edge"
-				>
-					{sticky ? "sticky" : `x: ${x}`}
-				</text>
+			<g ref="tooltip" className="tooltip">
+				<rect ref="tooltip-bg" rx="5" ry="5" fill="black" opacity="0.75" />
+				{!sticky && <text x={tooltipPadding} y={tooltipPadding}>{x}</text>}
 				{ys.map(({color, name, x, y}, index) => (
-					<text key={index}
-						x="20" y={20 * (index + 1) + 10}
-						dominantBaseline="text-before-edge"
-						fill={color}
-					>
-						{sticky && `x${index + 1}: ${x}, `}
-						{name}: {y}
-					</text>
+					<g key={index} transform={`translate(${tooltipPadding}, ${tooltipPadding + lineHeight * (index + 1)})`}>
+						<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
+						<text className="name" x="13">{name}</text>
+						<text className="value" textAnchor="end">{format(y)}</text>
+					</g>
 				))}
 			</g>
 		)
 	}
 
+	updateTooltipPosition = () => {
+		const {
+			width, height, padding,
+			mouseX, mouseY
+		} = this.props
+
+		const tooltip = this.refs["tooltip"]
+		const tooltipBg = this.refs["tooltip-bg"]
+		const tooltipNames = tooltip.querySelectorAll(".name")
+		const tooltipValues = tooltip.querySelectorAll(".value")
+
+		tooltipBg.setAttribute("width", 0)
+		tooltipBg.setAttribute("height", 0)
+		tooltipNames.forEach((node) => wrapText(node, 90))
+
+		const maxNameLength = Math.max(...[...tooltipNames].map((node) => node.getComputedTextLength()))
+		const maxValueLength = Math.max(...[...tooltipValues].map((node) => node.getComputedTextLength()))
+		this.maxValueX = Math.max((this.maxValueX || 0), 150, 13 + maxNameLength + 10 + maxValueLength)
+		tooltipValues.forEach((node) => node.setAttribute("x", this.maxValueX))
+
+		const {top, right, bottom, left} = tooltip.getBoundingClientRect()
+		const bgWidth = right - left + 20
+		const bgHeight = bottom - top + 20
+		tooltipBg.setAttribute("width", bgWidth)
+		tooltipBg.setAttribute("height", bgHeight)
+
+		tooltip.setAttribute("transform", `translate(${mouseX + 20}, ${mouseY - bgHeight / 2})`)
+	}
+
 }
 
-export default Tooltip
+function wrapText(node, maxTextLength) {
+	if (node.getComputedTextLength) {
+		let text = node.innerHTML
+		let textLength = node.getComputedTextLength()
+		while (text.length && 90 < textLength) {
+			node.innerHTML = (text = text.slice(0, -1)) + "…"
+			textLength = node.getComputedTextLength()
+		}
+	}
+}

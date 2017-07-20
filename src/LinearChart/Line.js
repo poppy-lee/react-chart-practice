@@ -5,6 +5,7 @@ import ImmutablePropTypes from "react-immutable-proptypes"
 import PropTypes from "prop-types"
 import React from "react"
 
+export default
 class Line extends React.Component {
 
 	static propTypes = {
@@ -87,5 +88,3 @@ class Line extends React.Component {
 	}
 
 }
-
-export default Line

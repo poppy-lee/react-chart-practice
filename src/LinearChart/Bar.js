@@ -2,6 +2,7 @@ import ImmutablePropTypes from "react-immutable-proptypes"
 import PropTypes from "prop-types"
 import React from "react"
 
+export default
 class Bar extends React.Component {
 
 	static propTypes = {
@@ -57,5 +58,3 @@ class Bar extends React.Component {
 	}
 
 }
-
-export default Bar

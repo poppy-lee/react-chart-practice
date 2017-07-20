@@ -1,6 +1,7 @@
 import PropTypes from "prop-types"
 import React from "react"
 
+export default
 class XAxis extends React.Component {
 
 	static propTpyes = {
@@ -38,13 +39,7 @@ class XAxis extends React.Component {
 							stroke="#bbbbbb"
 							x1="0" y1="0" x2="0" y2="5"
 						/>
-						<text
-							y="10"
-							textAnchor="middle"
-							dominantBaseline="text-before-edge"
-						>
-							{x}
-						</text>
+						<text y="10">{x}</text>
 					</g>
 				))}
 			</g>
@@ -52,5 +47,3 @@ class XAxis extends React.Component {
 	}
 
 }
-
-export default XAxis
