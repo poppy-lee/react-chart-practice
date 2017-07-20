@@ -10,7 +10,7 @@ import {
 			Focus, Tooltip
 } from "./LinearChart"
 
-const LENGTH = 10000
+const LENGTH = 1000
 
 const width = 700
 const height = 360
@@ -52,8 +52,9 @@ function generatePointList(length) {
 			return Immutable.Map({
 				x: index,
 				y: 0.01 < Math.random()
-					? Math.random() * 100000000
+					? Math.random() * 5000
 					: 0.5 < Math.random() ? 0 : null,
+				y: null,
 			})
 		})
 		.filter((point = Immutable.Map()) => {

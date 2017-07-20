@@ -162,7 +162,7 @@ class LinearChart extends React.Component {
 			this.getChartProps()
 				.filter(({type}) => type === "Bar")
 				.reduce((points, {pointList = Immutable.List()}) => points.concat(pointList.toJS()), [])
-				.filter((point) => point && Number.isFinite(point.y))
+				.filter((point) => point && isFinite(point.y))
 				.map(({x}) => x || 0)
 		)]
 
@@ -172,11 +172,13 @@ class LinearChart extends React.Component {
 			.map((x, index, xs) => Math.abs(x - (xs[index - 1]) || 0))
 			.filter((interval) => interval)
 
-		return Math.max(1 / this.pixelRatio, 0.8 * Math.min(...[
+		const bandWidth = Math.max(1 / this.pixelRatio, Math.min(
 			Math.abs(xScale(max) - xScale(max - Math.min(...intervals))),
 			2 * Math.abs(xScale(min) - xScale.range()[0]),
 			2 * Math.abs(xScale(max) - xScale.range()[1]),
-		]))
+		))
+
+		return bandWidth
 	}
 
 	getScales = () => {
@@ -214,7 +216,7 @@ class LinearChart extends React.Component {
 	getXYs = () => {
 		const points = this.getPointLists()
 			.reduce((points, pointList = Immutable.List()) => points.concat(pointList.toJS()), [])
-			.filter((point) => point && Number.isFinite(point.y))
+			.filter((point) => point && isFinite(point.y))
 
 		const sort = (a, b) => {
 			if (a > b) return 1
