@@ -36,6 +36,10 @@ class Tooltip extends React.Component {
 		),
 	}
 
+	padding = 10
+	lineCounts = 10
+	lineHeight = 18
+
 	componentDidMount() {
 		this.updateTooltipPosition()
 	}
@@ -46,21 +50,31 @@ class Tooltip extends React.Component {
 
 	render() {
 		const {sticky, x, ys} = this.props
-
-		const tooltipPadding = 10
-		const lineHeight = 18
-
+		const shouldRenderEtc = !!ys.slice(this.lineCounts).length
 		return (
 			<g ref="tooltip" className="tooltip">
 				<rect ref="tooltip-bg" rx="5" ry="5" fill="black" opacity="0.75" />
-				{!sticky && <text x={tooltipPadding} y={tooltipPadding}>{x}</text>}
-				{ys.map(({color, name, x, y}, index) => (
-					<g key={index} transform={`translate(${tooltipPadding}, ${tooltipPadding + lineHeight * (index + 1)})`}>
-						<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
-						<text className="name" x="13">{name}</text>
-						<text className="value" textAnchor="end">{format(y)}</text>
-					</g>
-				))}
+				{!sticky && <text x={this.padding} y={this.padding}>{x}</text>}
+				{ys.slice(0, this.lineCounts - shouldRenderEtc).map(this.renderLine)}
+				{shouldRenderEtc && (
+					this.renderLine({
+						color: "none",
+						name: `그 외 ${ys.length - 9}개`,
+						y: ys.slice(9).reduce((y, point) => y + (point.y || 0), 0)
+					}, 9)
+				)}
+			</g>
+		)
+	}
+
+	renderLine = ({color, name, x, y}, index) => {
+		const contentX = this.padding
+		const contentY = this.padding + this.lineHeight * (index + 1)
+		return (
+			<g key={index} transform={`translate(${contentX}, ${contentY})`}>
+				<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
+				<text className="name" x="13">{name}</text>
+				<text className="value" textAnchor="end">{format(y)}</text>
 			</g>
 		)
 	}

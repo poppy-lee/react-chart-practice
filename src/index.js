@@ -27,7 +27,7 @@ ReactDOM.render(
 		>
 			<YAxis />
 			<XAxis />
-			{[...Array(4)]
+			{[...Array(99)]
 				.map(() => generatePointList(LENGTH))
 				.map((pointList, index) => {
 					const Component = index % 2 ? Line : Bar
@@ -52,6 +52,7 @@ function generatePointList(length) {
 				y: 0.01 < Math.random()
 					? Math.random() * 5000
 					: 0.5 < Math.random() ? 0 : null,
+				y: index,
 			})
 		})
 		.filter((point = Immutable.Map()) => {
