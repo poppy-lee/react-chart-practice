@@ -23,6 +23,7 @@ class Bar extends React.Component {
 
 	getPointList = () => {
 		return this.props.pointList
+			.filter((point) => Number.isFinite(point.get("y")))
 			.sort((pointA, pointB) => {
 				if (pointA.get("x") < pointB.get("x")) return -1
 				if (pointA.get("x") > pointB.get("x")) return 1
@@ -41,18 +42,20 @@ class Bar extends React.Component {
 
 		return (
 			<g>
-				{this.getPointList().map((point) => {
-					const height = yScale(point.get("y")) - yScale(0)
-					return (
-						<rect key={point.get("x")}
-							fill={color}
-							width={barWidth}
-							height={Math.abs(height)}
-							x={(xScale(point.get("x")) - bandWidth / 2) + (bandWidth / typeCount * typeIndex) + barPadding}
-							y={height < 0 ? yScale(point.get("y")) : yScale(0)}
-						/>
-					)
-				})}
+				{this.getPointList()
+					.map((point) => {
+						const height = yScale(point.get("y")) - yScale(0)
+						return (
+							<rect key={point.get("x")}
+								fill={color}
+								width={barWidth}
+								height={Math.abs(height)}
+								x={(xScale(point.get("x")) - bandWidth / 2) + (bandWidth / typeCount * typeIndex) + barPadding}
+								y={height < 0 ? yScale(point.get("y")) : yScale(0)}
+							/>
+						)
+					})
+				}
 			</g>
 		)
 	}

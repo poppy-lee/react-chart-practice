@@ -10,7 +10,7 @@ import {
 			Focus, Tooltip
 } from "./LinearChart"
 
-const LENGTH = 10
+const LENGTH = 20
 
 const width = 700
 const height = 360
@@ -27,7 +27,7 @@ ReactDOM.render(
 		>
 			<YAxis />
 			<XAxis />
-			{[...Array(99)]
+			{[...Array(11)]
 				.map(() => generatePointList(LENGTH))
 				.map((pointList, index) => {
 					const Component = index % 2 ? Line : Bar
@@ -47,15 +47,8 @@ ReactDOM.render(
 function generatePointList(length) {
 	return Immutable.List([...Array(length + 1)])
 		.map((undef, index) => {
-			return Immutable.Map({
-				x: index,
-				y: 0.01 < Math.random()
-					? Math.random() * 5000
-					: 0.5 < Math.random() ? 0 : null,
-				y: index,
-			})
-		})
-		.filter((point = Immutable.Map()) => {
-			return !point.isEmpty() && isFinite(point.get("y"))
+			const x = index - length / 2
+			const y = Math.log(x)
+			return Immutable.Map({x, y})
 		})
 }

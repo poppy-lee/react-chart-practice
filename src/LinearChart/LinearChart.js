@@ -170,7 +170,7 @@ class LinearChart extends React.Component {
 		const min = Math.min(...xs)
 		const max = Math.max(...xs)
 		const intervals = xs
-			.map((x, index, xs) => Math.abs(x - (xs[index - 1]) || 0))
+			.map((x, index, xs) => Math.abs(x - (xs[index - 1] || 0)))
 			.filter((interval) => interval)
 
 		const bandWidth = Math.max(1 / this.pixelRatio, Math.min(
@@ -202,7 +202,7 @@ class LinearChart extends React.Component {
 	getDomains = () => {
 		const {xs, ys} = this.getXYs()
 		const xIntervals = xs
-			.map((x, index, xs) => x - (xs[index - 1] || 0))
+			.map((x, index, xs) => Math.abs(x - (xs[index - 1] || 0)))
 			.filter((interval) => interval)
 
 		return {
