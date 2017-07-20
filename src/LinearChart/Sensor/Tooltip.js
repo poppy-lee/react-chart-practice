@@ -91,7 +91,9 @@ class Tooltip extends React.Component {
 		tooltipBg.setAttribute("width", bgWidth)
 		tooltipBg.setAttribute("height", bgHeight)
 
-		tooltip.setAttribute("transform", `translate(${mouseX + 20}, ${mouseY - bgHeight / 2})`)
+		const tooltipX = mouseX + ((mouseX < (width + padding.left - padding.right) / 2) ? 20 : - 20 - bgWidth)
+		const tooltipY = Math.max(0, Math.min(mouseY - bgHeight / 2, height - bgHeight))
+		tooltip.setAttribute("transform", `translate(${tooltipX}, ${tooltipY})`)
 	}
 
 }
