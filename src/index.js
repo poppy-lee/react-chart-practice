@@ -48,7 +48,7 @@ function generatePointList(length) {
 	return Immutable.List([...Array(length + 1)])
 		.map((undef, index) => {
 			const x = index - length / 2
-			const y = Math.log(x)
+			const y = Math.pow(x, -3) * 1e-3
 			return Immutable.Map({x, y})
 		})
 }
