@@ -38,7 +38,10 @@ class Bar extends React.Component {
 		} = this.props
 
 		const barPadding = bandWidth * (this.props.barPadding || 0)
-		const barWidth = (bandWidth / typeCount) - 2 * barPadding
+		const barWidth = Math.max(
+			1 / (window.devicePixelRatio || 1),
+			(bandWidth / typeCount) - 2 * barPadding,
+		)
 
 		return (
 			<g>

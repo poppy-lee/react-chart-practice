@@ -28,8 +28,6 @@ class LinearChart extends React.Component {
 		colorArray: d3.schemeCategory10,
 	}
 
-	pixelRatio = (window.devicePixelRatio || 1)
-
   render() {
 		const {width, height} = this.props
 		const commonProps = {
@@ -97,7 +95,7 @@ class LinearChart extends React.Component {
 		const padding = this.getPadding()
 
 		const chartWidth = width - (padding.left + padding.right)
-		const chartPixels = chartWidth * this.pixelRatio
+		const chartPixels = chartWidth * (window.devicePixelRatio || 1)
 
 		return this.getChildren()
 			.filter(({props = {}}) => props.pointList)
@@ -176,13 +174,11 @@ class LinearChart extends React.Component {
 			.map((x, index, xs) => Math.abs(x - (xs[index - 1] || 0)))
 			.filter((interval) => interval)
 
-		const bandWidth = Math.max(1 / this.pixelRatio, Math.min(
+		return Math.min(
 			Math.abs(xScale(max) - xScale(max - Math.min(...intervals))),
 			2 * Math.abs(xScale(min) - xScale.range()[0]),
 			2 * Math.abs(xScale(max) - xScale.range()[1]),
-		))
-
-		return 0.8 * bandWidth
+		)
 	}
 
 	getScales = () => {

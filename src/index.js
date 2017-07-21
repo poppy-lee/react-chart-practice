@@ -17,7 +17,7 @@ function render() {
 	const margin = parseMargin(window.getComputedStyle(document.body).margin)
 	const width = (window.innerWidth || 0) - (margin.left + margin.right)
 	const height = (window.innerHeight || 0) - (margin.top + margin.bottom)
-	const padding = "30px 30px 40px 50px"
+	const padding = "30px 30px 40px 60px"
 
 	ReactDOM.render(
 		<div style={{fontSize: 0}}>
@@ -30,14 +30,10 @@ function render() {
 			>
 				<YAxis />
 				<XAxis />
-				{[...Array(4)]
-					.map(() => generatePointList(1000))
-					.map((pointList, index) => {
-						const Component = index % 2 ? Line : Bar
-						const name = index % 2 ? "Line" : "Bar"
-						return <Component key={index} name={name} pointList={pointList} />
-					})
-				}
+				<Bar pointList={generatePointList(10000)} />
+				<Bar pointList={generatePointList(10000)} />
+				<Bar pointList={generatePointList(10000).map((p) => p.set("y", -p.get("y")))} />
+				<Bar pointList={generatePointList(10000).map((p) => p.set("y", -p.get("y")))} />
 				<Sensor>
 					<Focus />
 					<Tooltip />
@@ -52,7 +48,7 @@ function generatePointList(length) {
 	return Immutable.List([...Array(Math.abs(length) + 1)])
 		.map((undef, index) => {
 			const x = index - length / 2
-			const y = (x * x * x * 1e+300) * Math.random()
+			const y = Math.sqrt(Math.pow(length / 2, 2) - Math.pow(x, 2)) * Math.random()
 			return Immutable.Map({x, y})
 		})
 }
