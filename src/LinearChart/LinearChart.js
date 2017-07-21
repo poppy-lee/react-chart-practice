@@ -108,16 +108,16 @@ class LinearChart extends React.Component {
 						if (pointA.get("x") < pointB.get("x")) return -1
 						return 0
 					})
-					.filter((point, index, pointList) => !(
-						filter
-						&& point && point.get("y") !== null      // do not filter null point
-						&& index && index !== pointList.size - 1 // do not filter first and last point
-						&& Math.floor(Math.random() * (props.pointList.size / chartPixels))
-					))
 					.map((point) => {
 						const y = point.get("y")
 						return point.set("y", (Math.abs(y) < MAX_VALUE ? y : Math.sign(y) * Infinity))
 					})
+					.filter((point, index) => !(
+						filter
+						&& point && Number.isFinite(point.get("x")) && isFinite(point.get("y"))
+						&& index && index !== props.pointList.size - 1
+						&& Math.floor(Math.random() * (props.pointList.size / chartPixels))
+					))
 			})
 	}
 
