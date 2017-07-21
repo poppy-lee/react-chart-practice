@@ -8,6 +8,7 @@ import numeral from "numeral"
 function format(number) {
 	switch (typeof number) {
 		case "number": {
+			if (!Number.isFinite(number)) return number
 			if (!number || 1e-2 <= Math.abs(number) && Math.abs(number) < 1e+15)
 				return numeral(number).format("0,.[00]")
 			else {

@@ -44,6 +44,7 @@ class Focus extends React.Component {
 				)}
 				{ys
 					.filter(({type}) => type === "Line")
+					.filter(({y}) => Number.isFinite(y))
 					.map(({color, x, y}, index) => (
 						<circle key={index}
 							r="4"
