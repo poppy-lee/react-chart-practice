@@ -17,7 +17,7 @@ function render() {
 	const margin = parseMargin(window.getComputedStyle(document.body).margin)
 	const width = (window.innerWidth || 0) - (margin.left + margin.right)
 	const height = (window.innerHeight || 0) - (margin.top + margin.bottom)
-	const padding = "30px 30px 40px 60px"
+	const padding = "30px 60px 40px"
 
 	ReactDOM.render(
 		<div style={{fontSize: 0}}>
@@ -28,12 +28,15 @@ function render() {
 					"#bfbfbf", "#235ef6", "#fa40a5", "#04a222", "#615d74",
 				]}
 			>
-				<YAxis />
+				<YAxis name="dollars" tickPrefix="$" />
+				<YAxis name="percent" tickPostfix="%" />
+				<YAxis name="ignored" />
+				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
 				<XAxis />
-				<Bar pointList={generatePointList(10000)} />
-				<Bar pointList={generatePointList(10000)} />
-				<Bar pointList={generatePointList(10000).map((p) => p.set("y", -p.get("y")))} />
-				<Bar pointList={generatePointList(10000).map((p) => p.set("y", -p.get("y")))} />
+				<Bar pointList={generatePointList(5000)} />
+				<Bar axis="percent" pointList={generatePointList(5000)} />
+				<Bar pointList={generatePointList(5000).map((p) => p.set("y", -p.get("y")))} />
+				<Bar pointList={generatePointList(5000).map((p) => p.set("y", -p.get("y")))} />
 				<Sensor>
 					<Focus />
 					<Tooltip />

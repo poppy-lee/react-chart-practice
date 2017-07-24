@@ -40,54 +40,58 @@ class LinearChart extends React.Component {
 				className="linear-chart"
 				width={String(width)} height={String(height)}
 			>
-				{this.renderAxes(commonProps)}
-				{this.renderCharts({
-					...commonProps,
-					bandWidth: this.getBandWidth()
-				})}
-				{this.renderSensor({
-					...commonProps, ...this.getXYs(),
-					chartProps: this.getChartProps()
-				})}
+				{this.renderYAxes(commonProps)}
+				{this.renderXAxes(commonProps)}
+				{this.renderCharts(commonProps)}
+				{this.renderSensor(commonProps)}
 			</svg>
     )
 	}
 
-	renderAxes = (props = {}) => {
-		return this.getChildren()
-			.filter(({type = () => null}) => ["XAxis", "YAxis"].includes(type.name))
-			.map((child, index) => {
-				return <child.type key={`axis-${index}`} {...{...props, ...(child.props || {})}} />
-			})
+	renderXAxes = (props = {}) => {
+		return this.getChildren("XAxis").slice(0, 1)
+			.map((child, index) => (
+				<child.type key={`axis-${index}`} {...{index, ...props, ...(child.props || {})}} />
+			))
+	}
+	renderYAxes = (props = {}) => {
+		return this.getChildren("YAxis").slice(0, 2)
+			.map((child, index) => (
+				<child.type key={`axis-y-${index}`} {...{index, ...props, ...(child.props || {})}} />
+			))
 	}
 	renderCharts = (props = {}) => {
 		const filtertedPointLists = this.getPointLists(true)
 		const chartProps = this.getChartProps()
-		return this.getChildren()
-			.filter(({props = {}}) => props.pointList)
+		return this.getChildren(["Bar", "Line"], true)
 			.map((child, index) => (
 				<child.type key={`chart-${index}`} {...{
 					...chartProps[index], ...props, ...(child.props || {}),
+					bandWidth: this.getBandWidth(),
 					pointList: filtertedPointLists[index],
 				}} />
 			))
-			.sort(({type: typeA}, {type: typeB}) => {
-				const typeOrder = ["Bar", "Line"]
-				return typeOrder.indexOf(typeA.name) - typeOrder.indexOf(typeB.name)
-			})
 	}
 	renderSensor = (props = {}) => {
-		return this.getChildren()
-			.filter(({type = () => null}) => ["Sensor"].includes(type.name))
-			.map((child, index) => {
-				return <child.type key={`sensor-${index}`} {...{...props, ...(child.props || {})}} />
-			})
+		const axesProps = this.getChildren("YAxis").slice(0, 2).map(({props}) => props || {})
+		return this.getChildren("Sensor")
+			.map((child, index) => (
+				<child.type key={`sensor-${index}`} {...{
+					...props, ...(child.props || {}),
+					...this.getXYs(),
+					axesProps, chartProps: this.getChartProps(),
+				}} />
+			))
 	}
 
-	getChildren = () => {
+	getChildren = (types = [], sort = false) => {
+		types = [].concat(types)
 		return [].concat(this.props.children)
-			.reduce((children, child) => children.concat(child), [])
-			.filter((child) => child)
+			.reduce((children, child) => children.concat(child || []), [])
+			.filter(({type = () => null}) => !types.length || types.includes(type.name))
+			.sort(({type: typeA}, {type: typeB}) => sort && (
+				types.indexOf(typeA.name) - types.indexOf(typeB.name)
+			))
 	}
 
 	getPointLists = (filter = false) => {
@@ -131,7 +135,6 @@ class LinearChart extends React.Component {
 				color: colorArray[index % colorArray.length],
 				...props,
 				pointList: pointLists[index],
-				chartIndex: index,
 				type: type.name,
 				typeIndex: (typeCounts[type.name] = (typeCounts[type.name] || 0) + 1) - 1,
 			}))

@@ -12,7 +12,6 @@ class Line extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
-		chartIndex: PropTypes.number,
 		type: PropTypes.string,
 		typeIndex: PropTypes.number,
 		typeCount: PropTypes.number,

@@ -29,7 +29,7 @@ class Focus extends React.Component {
 	render() {
 		const {
 			width, height, padding, xScale, yScale,
-			sticky, x, ys
+			sticky, mouseX, mouseY, x, ys
 		} = this.props
 
 		return (
@@ -43,7 +43,7 @@ class Focus extends React.Component {
 					/>
 				)}
 				{ys
-					.filter(({type}) => type === "Line")
+					//.filter(({type}) => type === "Line")
 					.filter(({y}) => Number.isFinite(y))
 					.map(({color, x, y}, index) => (
 						<circle key={index}

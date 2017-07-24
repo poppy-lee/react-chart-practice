@@ -9,9 +9,7 @@
 }
 .linear-chart > .axis.axis-x text {
 	text-anchor: middle;
-	dominant-baseline: hanging;
 }
 .linear-chart > .axis.axis-y text {
-	text-anchor: end;
 	dominant-baseline: middle;
 }

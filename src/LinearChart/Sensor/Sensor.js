@@ -2,7 +2,6 @@ import Immutable from "immutable"
 import ImmutablePropTypes from "react-immutable-proptypes"
 import PropTypes from "prop-types"
 import React from "react"
-import ReactDOM from "react-dom"
 
 const initialState = {
 	mouseX: undefined,
@@ -22,6 +21,7 @@ class Sensor extends React.Component {
 		yScale: PropTypes.func,
 		xs: PropTypes.array,
 		ys: PropTypes.array,
+		axesProps: PropTypes.array,
 		chartProps: PropTypes.array,
 
 		sticky: PropTypes.bool,
@@ -35,15 +35,15 @@ class Sensor extends React.Component {
 	}
 
 	getYs = (mouseX) => {
-		const {chartProps} = this.props
+		const {axesProps, chartProps} = this.props
 		const x = this.getX(mouseX)
-
 		return chartProps
 			.map((props, index) => {
+				const {tickPrefix, tickPostfix} = axesProps.find(({name}) => name === props.axis) || axesProps[0] || {}
 				const point = this.props.sticky
 					? findClosestPoint(props.pointList || Immutable.List(), x)
 					: findPoint(props.pointList || Immutable.List(), x)
-				return {...props, ...Immutable.Map(point).toObject()}
+				return {...props, ...Immutable.Map(point).toObject(), tickPrefix, tickPostfix}
 			})
 			.filter(({x, y}) => Number.isFinite(x) && !isNaN(y))
 	}

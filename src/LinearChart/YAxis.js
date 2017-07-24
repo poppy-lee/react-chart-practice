@@ -1,27 +1,7 @@
 import PropTypes from "prop-types"
 import React from "react"
 
-import numeral from "numeral"
-
-function humanize(number) {
-	switch (typeof number) {
-		case "number": {
-			if (!Number.isFinite(number)) return number
-			if (!number || 1e-2 <= Math.abs(number) && Math.abs(number) < 1e+15)
-				return numeral(number).format("0,.[00]a").toUpperCase()
-			else {
-				const [fraction, exponent] = numeral(number).format("0.[00]e+0").split("e")
-				const [fixedFraction, fixedExponent] = numeral(fraction).format("0.[00]e+0").split("e")
-				return (
-					<tspan>
-						{numeral(fixedFraction).format("0.[00]")}
-						x10<tspan fontSize="8" baselineShift="super">{Number(exponent) + Number(fixedExponent)}</tspan>
-					</tspan>
-				)
-			}
-		}
-	}
-}
+import humanize from "./lib/humanize"
 
 export default
 class YAxis extends React.Component {
@@ -33,37 +13,40 @@ class YAxis extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
+		index: PropTypes.number,
+		ticks: PropTypes.number,
 		tickPrefix: PropTypes.string,
 		tickPostfix: PropTypes.string,
 	}
 
 	render() {
-		const {
-			width, height, padding, xScale, yScale,
-			tickPrefix, tickPostfix,
-		} = this.props
-
-		const [startX, endX] = [padding.left, width - padding.right]
-		const [startY, endY] = [height - padding.bottom, padding.top]
-
-		const yTicks = yScale.ticks(6)
-
+		const {xScale, yScale, ticks} = this.props
+		const yTicks = yScale.ticks(Number.isFinite(ticks) ? ticks : 10)
 		return (
 			<g className="axis axis-y">
-				{yTicks.map((y) => (
-					<g key={y}
-						transform={`translate(0, ${yScale(y)})`}
-					>
-						<line
-							stroke="#bbbbbb"
-							x1={Math.min(startX, endX)} y1="0"
-							x2={Math.max(startX, endX)} y2="0"
-						/>
-						<text x={Math.min(startX, endX) - 5}>
-							{tickPrefix}{humanize(y)}{tickPostfix}
-						</text>
-					</g>
-				))}
+				{yTicks.map(this.renderTick)}
+			</g>
+		)
+	}
+
+	renderTick = (y) => {
+		const {
+			width, height, padding, xScale, yScale,
+			index, tickPrefix, tickPostfix,
+		} = this.props
+
+		return (
+			<g key={y} transform={`translate(0, ${yScale(y)})`} >
+				<line stroke="#bbbbbb"
+					x1={padding.left} y1="0"
+					x2={width - padding.right} y2="0"
+				/>
+				<text
+					x={!index ? padding.left - 5 : width - padding.right + 5}
+					textAnchor={!index ? "end" : "start"}
+				>
+					{tickPrefix}{humanize(y)}{tickPostfix}
+				</text>
 			</g>
 		)
 	}

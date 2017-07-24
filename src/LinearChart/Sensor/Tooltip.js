@@ -3,27 +3,7 @@ import "./Tooltip.css"
 import PropTypes from "prop-types"
 import React from "react"
 
-import numeral from "numeral"
-
-function format(number) {
-	switch (typeof number) {
-		case "number": {
-			if (!Number.isFinite(number)) return number
-			if (!number || 1e-2 <= Math.abs(number) && Math.abs(number) < 1e+15)
-				return numeral(number).format("0,.[00]")
-			else {
-				const [fraction, exponent] = numeral(number).format("0.[00]e+0").split("e")
-				const [fixedFraction, fixedExponent] = numeral(fraction).format("0.[00]e+0").split("e")
-				return (
-					<tspan>
-						{numeral(fixedFraction).format("0.00")}
-						x10<tspan fontSize="8" baselineShift="super">{Number(exponent) + Number(fixedExponent)}</tspan>
-					</tspan>
-				)
-			}
-		}
-	}
-}
+import format from "../lib/format"
 
 export default
 class Tooltip extends React.Component {
@@ -45,6 +25,8 @@ class Tooltip extends React.Component {
 				type: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+				tickPrefix: PropTypes.string,
+				tickPostfix: PropTypes.string,
 			})
 		),
 	}
@@ -80,14 +62,14 @@ class Tooltip extends React.Component {
 		)
 	}
 
-	renderLine = ({color, name, x, y}, index) => {
+	renderLine = ({color, name, x, y, tickPrefix, tickPostfix}, index) => {
 		const contentX = this.padding
 		const contentY = this.padding + this.lineHeight * (index + 1)
 		return (
 			<g key={index} transform={`translate(${contentX}, ${contentY})`}>
 				<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
 				<text className="name" x="13">{name}</text>
-				<text className="value" textAnchor="end">{format(y)}</text>
+				<text className="value" textAnchor="end">{tickPrefix}{format(y)}{tickPostfix}</text>
 			</g>
 		)
 	}
