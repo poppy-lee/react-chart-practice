@@ -63,13 +63,17 @@ class LinearChart extends React.Component {
 	renderCharts = (props = {}) => {
 		const filtertedPointLists = this.getPointLists(true)
 		const chartProps = this.getChartProps()
-		return this.getChildren(["Bar", "Line"], true)
+		const chartTypes = ["Bar", "Line"]
+		return this.getChildren(chartTypes)
 			.map((child, index) => (
 				<child.type key={`chart-${index}`} {...{
 					...chartProps[index], ...props, ...(child.props || {}),
 					bandWidth: this.getBandWidth(),
 					pointList: filtertedPointLists[index],
 				}} />
+			))
+			.sort(({type: typeA}, {type: typeB}) => (
+				chartTypes.indexOf(typeA.name) - chartTypes.indexOf(typeB.name)
 			))
 	}
 	renderSensor = (props = {}) => {
@@ -84,14 +88,11 @@ class LinearChart extends React.Component {
 			))
 	}
 
-	getChildren = (types = [], sort = false) => {
+	getChildren = (types = []) => {
 		types = [].concat(types)
 		return [].concat(this.props.children)
 			.reduce((children, child) => children.concat(child || []), [])
 			.filter(({type = () => null}) => !types.length || types.includes(type.name))
-			.sort(({type: typeA}, {type: typeB}) => sort && (
-				types.indexOf(typeA.name) - types.indexOf(typeB.name)
-			))
 	}
 
 	getPointLists = (filter = false) => {
@@ -101,8 +102,7 @@ class LinearChart extends React.Component {
 		const chartWidth = width - (padding.left + padding.right)
 		const chartPixels = chartWidth * (window.devicePixelRatio || 1)
 
-		return this.getChildren()
-			.filter(({props = {}}) => props.pointList)
+		return this.getChildren(["Bar", "Line"])
 			.map(({props = {}}, index) => {
 				return props.pointList
 					.sort((pointA, pointB) => {
@@ -128,8 +128,7 @@ class LinearChart extends React.Component {
 		const pointLists = this.getPointLists()
 		const typeCounts = {}
 
-		return this.getChildren()
-			.filter(({props = {}}) => props.pointList)
+		return this.getChildren(["Bar", "Line"])
 			.map(({type = () => null, props = {}}, index) => ({
 				name: `y${index + 1}`,
 				color: colorArray[index % colorArray.length],

@@ -45,7 +45,7 @@ class YAxis extends React.Component {
 					x={!index ? padding.left - 5 : width - padding.right + 5}
 					textAnchor={!index ? "end" : "start"}
 				>
-					{tickPrefix}{humanize(y)}{tickPostfix}
+					{y < 0 && "-"}{tickPrefix}{humanize(Math.abs(y))}{tickPostfix}
 				</text>
 			</g>
 		)

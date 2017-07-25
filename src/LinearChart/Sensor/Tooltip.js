@@ -69,7 +69,9 @@ class Tooltip extends React.Component {
 			<g key={index} transform={`translate(${contentX}, ${contentY})`}>
 				<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
 				<text className="name" x="13">{name}</text>
-				<text className="value" textAnchor="end">{tickPrefix}{format(y)}{tickPostfix}</text>
+				<text className="value" textAnchor="end">
+					{y < 0 && "-"}{tickPrefix}{format(Math.abs(y))}{tickPostfix}
+				</text>
 			</g>
 		)
 	}

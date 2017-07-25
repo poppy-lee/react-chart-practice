@@ -30,12 +30,10 @@ function render() {
 			>
 				<YAxis name="dollars" tickPrefix="$" />
 				<YAxis name="percent" tickPostfix="%" />
-				<YAxis name="ignored" />
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
-				<XAxis />
-				<Bar pointList={generatePointList(5000)} />
+				<Line pointList={generatePointList(5000)} />
 				<Bar axis="percent" pointList={generatePointList(5000)} />
-				<Bar pointList={generatePointList(5000).map((p) => p.set("y", -p.get("y")))} />
+				<Line pointList={generatePointList(5000).map((p) => p.set("y", -p.get("y")))} />
 				<Bar pointList={generatePointList(5000).map((p) => p.set("y", -p.get("y")))} />
 				<Sensor>
 					<Focus />
@@ -51,7 +49,7 @@ function generatePointList(length) {
 	return Immutable.List([...Array(Math.abs(length) + 1)])
 		.map((undef, index) => {
 			const x = index - length / 2
-			const y = Math.sqrt(Math.pow(length / 2, 2) - Math.pow(x, 2)) * Math.random()
+			const y = Math.sqrt(Math.pow(length / 2, 2) - Math.pow(x, 2))
 			return Immutable.Map({x, y})
 		})
 }
