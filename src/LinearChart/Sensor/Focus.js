@@ -11,6 +11,7 @@ class Focus extends React.Component {
 		padding: PropTypes.object,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
+		y1Scale: PropTypes.func,
 
 		sticky: PropTypes.bool,
 		mouseX: PropTypes.number,
@@ -21,13 +22,16 @@ class Focus extends React.Component {
 				color: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+				axix: PropTypes.string,
+				axisIndex: PropTypes.number,
+				axisCount: PropTypes.number,
 			})
 		),
 	}
 
 	render() {
 		const {
-			width, height, padding, xScale, yScale,
+			width, height, padding, xScale, yScale, y1Scale,
 			sticky, mouseX, mouseY, x, ys
 		} = this.props
 
@@ -43,10 +47,10 @@ class Focus extends React.Component {
 				)}
 				{ys
 					.filter(({y}) => Number.isFinite(y))
-					.map(({color, x: pointX, y: pointY}, index) => (
+					.map(({color, x: pointX, y: pointY, axisIndex}, index) => (
 						<circle key={index}
 							r="4"
-							cx={xScale(pointX || x)} cy={yScale(pointY)}
+							cx={xScale(pointX || x)} cy={!axisIndex ? yScale(pointY) : y1Scale(pointY)}
 							stroke="#ffffff"
 							fill={color}
 						/>

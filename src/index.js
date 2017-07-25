@@ -33,7 +33,7 @@ function render() {
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
 				<Line pointList={generatePointList(10)} />
 				<Bar axis="percent" pointList={generatePointList(20)} />
-				<Line pointList={generatePointList(10).map((p) => p.set("y", -p.get("y")))} />
+				<Line axis="percent" pointList={generatePointList(10).map((p) => p.set("y", -p.get("y")))} />
 				<Bar pointList={generatePointList(10).map((p) => p.set("y", -p.get("y")))} />
 				<Sensor>
 					<Focus />

@@ -19,10 +19,28 @@ class Sensor extends React.Component {
 		padding: PropTypes.object,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
+		y1Scale: PropTypes.func,
 		xs: PropTypes.array,
 		ys: PropTypes.array,
-		axesProps: PropTypes.array,
-		chartProps: PropTypes.array,
+		chartProps: PropTypes.arrayOf(
+			PropTypes.shape({
+				name: PropTypes.string,
+				color: PropTypes.string,
+				bandWidth: PropTypes.number,
+
+				pointList: ImmutablePropTypes.list,
+
+				axix: PropTypes.string,
+				axisIndex: PropTypes.number,
+				axisCount: PropTypes.number,
+				yPrefix: PropTypes.any,
+				yPostfix: PropTypes.any,
+
+				type: PropTypes.string,
+				typeIndex: PropTypes.number,
+				typeCount: PropTypes.number,
+			})
+		),
 
 		sticky: PropTypes.bool,
 	}
@@ -35,18 +53,14 @@ class Sensor extends React.Component {
 	}
 
 	getYs = (mouseX) => {
-		const {axesProps, chartProps} = this.props
+		const {chartProps} = this.props
 		const x = this.getX(mouseX)
 		return chartProps
 			.map((props, index) => {
-				const {tickPrefix, tickPostfix} = axesProps.find(({name}) => name === props.axis) || axesProps[0] || {}
 				const point = this.props.sticky
 					? findClosestPoint(props.pointList || Immutable.List(), x)
 					: findPoint(props.pointList || Immutable.List(), x)
-				return {
-					...props, ...Immutable.Map(point).toObject(),
-					yPrefix: tickPrefix, yPostfix: tickPostfix,
-				}
+				return {...props, ...Immutable.Map(point).toObject()}
 			})
 			.filter(({x, y}) => Number.isFinite(x) && !isNaN(y))
 	}
@@ -64,13 +78,13 @@ class Sensor extends React.Component {
 		const {width, height} = this.props
 
 		return (
-			<g ref="sensor"
+			<g
 				style={{pointerEvents: "all"}}
 				onMouseEnter={this.onMouseEvent}
 				onMouseMove={this.onMouseEvent}
 				onMouseLeave={() => this.setState(initialState)}
 			>
-				<rect
+				<rect ref="sensor"
 					width={String(width)} height={String(height)}
 					style={{fill: "none"}}
 				/>

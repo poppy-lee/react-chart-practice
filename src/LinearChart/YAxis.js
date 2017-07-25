@@ -12,6 +12,7 @@ class YAxis extends React.Component {
 		padding: PropTypes.object,
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
+		y1Scale: PropTypes.func,
 
 		typeIndex: PropTypes.number,
 		typeCount: PropTypes.number,
@@ -20,8 +21,17 @@ class YAxis extends React.Component {
 		tickPostfix: PropTypes.string,
 	}
 
+	getScales = () => {
+		const {typeIndex, xScale, yScale, y1Scale} = this.props
+		switch (typeIndex) {
+			case 0: return {xScale, yScale}
+			case 1: return {xScale, yScale: y1Scale}
+		}
+	}
+
 	render() {
-		const {yScale, ticks} = this.props
+		const {ticks} = this.props
+		const {yScale} = this.getScales()
 		const yTicks = yScale.ticks(Number.isFinite(ticks) ? ticks : 10)
 		return (
 			<g className="axis axis-y">
@@ -32,10 +42,11 @@ class YAxis extends React.Component {
 
 	renderTick = (y) => {
 		const {
-			width, height, padding, xScale, yScale,
+			width, height, padding,
 			typeIndex, typeCount, tickPrefix, tickPostfix,
 		} = this.props
 
+		const {xScale, yScale} = this.getScales()
 		const x1 = typeCount <= 1
 			? padding.left
 			: (!typeIndex ? padding.left : width - padding.right - 5)

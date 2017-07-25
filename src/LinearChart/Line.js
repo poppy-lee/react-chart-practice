@@ -11,28 +11,31 @@ class Line extends React.Component {
 	static propTypes = {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
+		y1Scale: PropTypes.func,
 
-		typeIndex: PropTypes.number,
-		typeCount: PropTypes.number,
-		bandWidth: PropTypes.number,
 		pointList: ImmutablePropTypes.list.isRequired,
-
 		name: PropTypes.string,
 		color: PropTypes.string,
 		lineWidth: PropTypes.number,
+
+		axix: PropTypes.string,
+		axisIndex: PropTypes.number,
+		axisCount: PropTypes.number,
+		type: PropTypes.string,
+		typeIndex: PropTypes.number,
+		typeCount: PropTypes.number,
 	}
 
 	static defaultProps = {
 		lineWidth: 2.5,
 	}
 
-	getPointList = () => {
-		return this.props.pointList
-			.sort((pointA, pointB) => {
-				if (pointA.get("x") < pointB.get("x")) return -1
-				if (pointA.get("x") > pointB.get("x")) return 1
-				return 0
-			})
+	getScales = () => {
+		const {axisIndex, xScale, yScale, y1Scale} = this.props
+		switch (axisIndex) {
+			case 0: return {xScale, yScale}
+			case 1: return {xScale, yScale: y1Scale}
+		}
 	}
 
 	render() {
@@ -44,7 +47,7 @@ class Line extends React.Component {
 					stroke={color}
 					strokeWidth={lineWidth}
 					fill="none"
-					d={this.getDescription(this.getPointList())}
+					d={this.getDescription()}
 				/>
 				{this.renderCircles()}
 			</g>
@@ -52,12 +55,10 @@ class Line extends React.Component {
 	}
 
 	renderCircles = () => {
-		const {
-			xScale, yScale, index,
-			color, lineWidth,
-		} = this.props
+		const {color, lineWidth, axisIndex} = this.props
+		const {xScale, yScale} = this.getScales()
 
-		return this.getPointList()
+		return this.props.pointList
 			.filter((point, index, pointList) => (
 				Number.isFinite(point.get("y")) && !(
 					index
@@ -75,8 +76,9 @@ class Line extends React.Component {
 			))
 	}
 
-	getDescription = (pointList = Immutable.List()) => {
-		const {xScale, yScale} = this.props
+	getDescription = (pointList = this.props.pointList) => {
+		const {xScale, yScale} = this.getScales()
+
 		return (
 			d3.line()
 				.defined((point) => point && Number.isFinite(point.y))

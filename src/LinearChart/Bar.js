@@ -8,32 +8,33 @@ class Bar extends React.Component {
 	static propTypes = {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
+		y1Scale: PropTypes.func,
 
-		typeIndex: PropTypes.number,
-		typeCount: PropTypes.number,
-		bandWidth: PropTypes.number,
 		pointList: ImmutablePropTypes.list.isRequired,
-
 		name: PropTypes.string,
 		color: PropTypes.string,
 		barPadding: PropTypes.number,
+
+		bandWidth: PropTypes.number,
+		axix: PropTypes.string,
+		axisIndex: PropTypes.number,
+		axisCount: PropTypes.number,
+		type: PropTypes.string,
+		typeIndex: PropTypes.number,
+		typeCount: PropTypes.number,
 	}
 
-	getPointList = () => {
-		return this.props.pointList
-			.filter((point) => Number.isFinite(point.get("y")))
-			.sort((pointA, pointB) => {
-				if (pointA.get("x") < pointB.get("x")) return -1
-				if (pointA.get("x") > pointB.get("x")) return 1
-				return 0
-			})
+	getScales = () => {
+		const {axisIndex, xScale, yScale, y1Scale} = this.props
+		switch (axisIndex) {
+			case 0: return {xScale, yScale}
+			case 1: return {xScale, yScale: y1Scale}
+		}
 	}
 
 	render() {
-		const {
-			xScale, yScale,
-			typeIndex, typeCount, bandWidth, color,
-		} = this.props
+		const {color, bandWidth, axisIndex, typeIndex, typeCount,} = this.props
+		const {xScale, yScale} = this.getScales()
 
 		const barPadding = bandWidth * (this.props.barPadding || 0)
 		const barWidth = Math.max(
@@ -43,7 +44,7 @@ class Bar extends React.Component {
 
 		return (
 			<g>
-				{this.getPointList()
+				{this.props.pointList
 					.map((point) => {
 						const height = yScale(point.get("y")) - yScale(0)
 						return (
