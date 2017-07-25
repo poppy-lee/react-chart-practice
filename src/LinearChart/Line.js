@@ -12,7 +12,6 @@ class Line extends React.Component {
 		xScale: PropTypes.func,
 		yScale: PropTypes.func,
 
-		type: PropTypes.string,
 		typeIndex: PropTypes.number,
 		typeCount: PropTypes.number,
 		bandWidth: PropTypes.number,

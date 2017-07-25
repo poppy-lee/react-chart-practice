@@ -19,7 +19,6 @@ class Focus extends React.Component {
 		ys: PropTypes.arrayOf(
 			PropTypes.shape({
 				color: PropTypes.string,
-				type: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 			})
@@ -43,12 +42,11 @@ class Focus extends React.Component {
 					/>
 				)}
 				{ys
-					//.filter(({type}) => type === "Line")
 					.filter(({y}) => Number.isFinite(y))
-					.map(({color, x, y}, index) => (
+					.map(({color, x: pointX, y: pointY}, index) => (
 						<circle key={index}
 							r="4"
-							cx={xScale(x)} cy={yScale(y)}
+							cx={xScale(pointX || x)} cy={yScale(pointY)}
 							stroke="#ffffff"
 							fill={color}
 						/>

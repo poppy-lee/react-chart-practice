@@ -43,7 +43,10 @@ class Sensor extends React.Component {
 				const point = this.props.sticky
 					? findClosestPoint(props.pointList || Immutable.List(), x)
 					: findPoint(props.pointList || Immutable.List(), x)
-				return {...props, ...Immutable.Map(point).toObject(), tickPrefix, tickPostfix}
+				return {
+					...props, ...Immutable.Map(point).toObject(),
+					yPrefix: tickPrefix, yPostfix: tickPostfix,
+				}
 			})
 			.filter(({x, y}) => Number.isFinite(x) && !isNaN(y))
 	}
@@ -61,13 +64,13 @@ class Sensor extends React.Component {
 		const {width, height} = this.props
 
 		return (
-			<g
+			<g ref="sensor"
 				style={{pointerEvents: "all"}}
 				onMouseEnter={this.onMouseEvent}
 				onMouseMove={this.onMouseEvent}
 				onMouseLeave={() => this.setState(initialState)}
 			>
-				<rect ref="sensor"
+				<rect
 					width={String(width)} height={String(height)}
 					style={{fill: "none"}}
 				/>

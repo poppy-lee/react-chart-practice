@@ -22,11 +22,10 @@ class Tooltip extends React.Component {
 		ys: PropTypes.arrayOf(
 			PropTypes.shape({
 				color: PropTypes.string,
-				type: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-				tickPrefix: PropTypes.string,
-				tickPostfix: PropTypes.string,
+				yPrefix: PropTypes.string,
+				yPostfix: PropTypes.string,
 			})
 		),
 	}
@@ -62,7 +61,7 @@ class Tooltip extends React.Component {
 		)
 	}
 
-	renderLine = ({color, name, x, y, tickPrefix, tickPostfix}, index) => {
+	renderLine = ({color, name, x, y, yPrefix, yPostfix}, index) => {
 		const contentX = this.padding
 		const contentY = this.padding + this.lineHeight * (index + 1)
 		return (
@@ -70,7 +69,7 @@ class Tooltip extends React.Component {
 				<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
 				<text className="name" x="13">{name}</text>
 				<text className="value" textAnchor="end">
-					{y < 0 && "-"}{tickPrefix}{format(Math.abs(y))}{tickPostfix}
+					{y < 0 && "-"}{yPrefix}{format(Math.abs(y))}{yPostfix}
 				</text>
 			</g>
 		)
@@ -111,7 +110,7 @@ class Tooltip extends React.Component {
 
 function wrapText(node, maxTextLength) {
 	if (node.getComputedTextLength) {
-		let text = node.innerHTML
+		let text = node.innerHTML || ""
 		let textLength = node.getComputedTextLength()
 		while (text.length && 90 < textLength) {
 			node.innerHTML = (text = text.slice(0, -1)) + "…"
