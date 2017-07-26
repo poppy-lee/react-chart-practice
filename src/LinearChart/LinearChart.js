@@ -211,22 +211,34 @@ class LinearChart extends React.Component {
 
 	getDomains = () => {
 		const {xs, ys, y1s} = this.getXYs()
-		const xIntervals = xs
+		const intervals = xs
 			.map((x, index, xs) => Math.abs(x - (xs[index - 1] || 0)))
 			.filter((interval) => interval)
 
+		const yMin = Math.max(Math.min(0, ...ys), -MAX_VALUE)
+		const yMinCalc = isFinite((yMax * y1Min) / y1Max) ? (yMax * y1Min) / y1Max : null
+		const yMax = Math.min(Math.max(0, ...ys), MAX_VALUE)
+		const yMaxCalc = isFinite((yMin * y1Max) / y1Min) ? (yMin * y1Max) / y1Min : null
+		const y1Min = Math.max(Math.min(0, ...y1s), -MAX_VALUE)
+		const y1MinCalc = isFinite((yMin * y1Max) / yMax) ? (yMin * y1Max) / yMax : null
+		const y1Max = Math.min(Math.max(0, ...y1s), MAX_VALUE)
+		const y1MaxCalc = isFinite((yMax * y1Min) / yMin) ? (yMax * y1Min) / yMin : null
+
+		const y1MinRatio = (yMin * y1Max) / (yMax * y1Min)
+		const y1MaxRatio = 1 / y1MinRatio
+
 		return {
 			xDomain: [
-				Math.min(...xs) - Math.min(...xIntervals) / 2,
-				Math.max(...xs) + Math.min(...xIntervals) / 2,
+				Math.min(...xs) - Math.min(...intervals) / 2,
+				Math.max(...xs) + Math.min(...intervals) / 2,
 			],
 			yDomain: [
-				Math.max(Math.min(0, ...ys), -MAX_VALUE),
-				Math.min(Math.max(0, ...ys), MAX_VALUE),
+				yMin || yMinCalc || y1Min,
+				yMax || yMaxCalc || y1Max,
 			],
 			y1Domain: [
-				Math.max(Math.min(0, ...y1s), -MAX_VALUE),
-				Math.min(Math.max(0, ...y1s), MAX_VALUE),
+				y1Min * (1 <= y1MinRatio ? y1MinRatio : 1) || y1MinCalc || yMin,
+				y1Max * (1 <= y1MaxRatio ? y1MaxRatio : 1) || y1MaxCalc || yMax,
 			],
 		}
 	}
@@ -237,13 +249,13 @@ class LinearChart extends React.Component {
 
 		const xPoints = chartProps
 			.reduce((points, {pointList}) => points.concat(Immutable.List(pointList).toJS()), [])
-			.filter((point) => point && Number.isFinite(point.x) && !isNaN(point.y))
+			.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
 		const [yPoints = [], y1Points = []] = this.getChildren("YAxis").slice(0, 2)
 			.reduce((points, {props}, index) => {
 				points[index] = chartProps
 					.filter(({axis}) => (!index && !axis) || (props.name === axis))
 					.reduce((points, {pointList}) => points.concat(Immutable.List(pointList).toJS()), [])
-					.filter((point) => point && Number.isFinite(point.x) && !isNaN(point.y))
+					.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
 				return points
 			}, [])
 

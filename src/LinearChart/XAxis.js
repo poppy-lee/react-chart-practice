@@ -9,16 +9,21 @@ class XAxis extends React.Component {
 		height: PropTypes.number,
 		padding: PropTypes.object,
 		xScale: PropTypes.func,
+		yScale: PropTypes.func,
 
 		ticks: PropTypes.number,
 		tickFormat: PropTypes.func,
 	}
 
 	render() {
-		const {width, padding, xScale, ticks} = this.props
+		const {width, padding, xScale, yScale, ticks} = this.props
 		const xTicks = xScale.ticks(Number.isFinite(ticks) ? ticks : 10)
 		return (
 			<g className="axis axis-x">
+				<line stroke="#bbbbbb" strokeWidth="2"
+					x1={padding.left} y1={yScale(0)}
+					x2={width - padding.right} y2={yScale(0)}
+				/>
 				{xTicks.map(this.renderTick)}
 			</g>
 		)
