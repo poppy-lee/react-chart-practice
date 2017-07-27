@@ -31,10 +31,11 @@ function render() {
 				<YAxis name="dollars" tickPrefix="$" />
 				<YAxis name="percent" tickPostfix="%" />
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
-				<Bar axis="dollars" pointList={generatePointList(10, -1)} />
-				<Bar pointList={generatePointList(20)} />
-				 <Line axis="percent" pointList={generatePointList(30, -1)} />
-				<Bar pointList={generatePointList(40)} />
+				<Bar pointList={generatePointList(10)} />
+				<Bar pointList={generatePointList(20, -1)} />
+				<Bar pointList={generatePointList(30, -1)} />
+				<Line axis="percent" pointList={generatePointList(4, -1)} />
+				<Line axis="percent" pointList={generatePointList(50)} />
 				<Sensor>
 					<Focus />
 					<Tooltip />

@@ -216,30 +216,43 @@ class LinearChart extends React.Component {
 			.filter((interval) => interval)
 
 		const yMin = Math.max(Math.min(0, ...ys), -MAX_VALUE)
-		const yMinCalc = isFinite((yMax * y1Min) / y1Max) ? (yMax * y1Min) / y1Max : null
 		const yMax = Math.min(Math.max(0, ...ys), MAX_VALUE)
-		const yMaxCalc = isFinite((yMin * y1Max) / y1Min) ? (yMin * y1Max) / y1Min : null
 		const y1Min = Math.max(Math.min(0, ...y1s), -MAX_VALUE)
-		const y1MinCalc = isFinite((yMin * y1Max) / yMax) ? (yMin * y1Max) / yMax : null
 		const y1Max = Math.min(Math.max(0, ...y1s), MAX_VALUE)
-		const y1MaxCalc = isFinite((yMax * y1Min) / yMin) ? (yMax * y1Min) / yMin : null
 
-		const y1MinRatio = (yMin * y1Max) / (yMax * y1Min)
-		const y1MaxRatio = 1 / y1MinRatio
+		const yRatio = Math.min(-yMin, yMax) / Math.max(-yMin, yMax)
+		const y1Ratio = Math.min(-y1Min, y1Max) / Math.max(-y1Min, y1Max)
 
-		return {
-			xDomain: [
-				Math.min(...xs) - Math.min(...intervals) / 2,
-				Math.max(...xs) + Math.min(...intervals) / 2,
-			],
-			yDomain: [
-				yMin || yMinCalc || y1Min,
-				yMax || yMaxCalc || y1Max,
-			],
-			y1Domain: [
-				y1Min * (1 <= y1MinRatio ? y1MinRatio : 1) || y1MinCalc || yMin,
-				y1Max * (1 <= y1MaxRatio ? y1MaxRatio : 1) || y1MaxCalc || yMax,
-			],
+		const xDomain = [
+			Math.min(...xs) - Math.min(...intervals) / 2,
+			Math.max(...xs) + Math.min(...intervals) / 2,
+		]
+
+		switch (true) {
+			case (-yMin < yMax && -y1Min >= y1Max):
+			case (-yMin >= yMax && -y1Min < y1Max):
+				return {
+					xDomain,
+					yDomain: [-Math.max(-yMin, yMax), Math.max(-yMin, yMax)],
+					y1Domain: [-Math.max(-y1Min, y1Max), Math.max(-y1Min, y1Max)],
+				}
+			case (-yMin < yMax && -y1Min < y1Max):
+			case (-yMin >= yMax && -y1Min >= y1Max):
+				return {
+					xDomain,
+					yDomain: (yRatio >= y1Ratio)
+						? [yMin, yMax]
+						: [
+							-(-y1Min < y1Max ? y1Ratio : 1) * Math.max(-yMin, yMax),
+							(-y1Min >= y1Max ? y1Ratio : 1) * Math.max(-yMin, yMax),
+						],
+					y1Domain: (yRatio >= y1Ratio)
+						? [
+							-(-yMin < yMax ? yRatio : 1) * Math.max(-y1Min, y1Max),
+							(-yMin >= yMax ? yRatio : 1) * Math.max(-y1Min, y1Max),
+						]
+						: [y1Min, y1Max],
+				}
 		}
 	}
 
