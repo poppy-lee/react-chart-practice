@@ -34,7 +34,7 @@ class XAxis extends React.Component {
 		return (
 			<g key={x} transform={`translate(${xScale(x)}, ${height - padding.bottom})`}>
 				<line stroke="#bbbbbb" x1="0" y1="0" x2="0" y2="5" />
-				<text y="10" dominantBaseline="hanging">
+				<text y="18">
 					{typeof tickFormat === "function" ? tickFormat(x) : x}
 				</text>
 			</g>
