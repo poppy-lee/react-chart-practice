@@ -19,6 +19,7 @@ class Sensor extends React.Component {
 		yScale: PropTypes.func,
 		y1Scale: PropTypes.func,
 
+		xPoints: PropTypes.array,
 		chartProps: PropTypes.arrayOf(
 			PropTypes.shape({
 				name: PropTypes.string,
@@ -44,19 +45,7 @@ class Sensor extends React.Component {
 	state = initialState
 
 	getX = (mouseX) => {
-		const {xScale, chartProps} = this.props
-
-		const points = chartProps
-			.reduce((points, props) => points.concat(props.points), [])
-			.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
-		const xPoints = [...new Set(points.map(({x}) => x))]
-			.map((x) => ({x}))
-			.sort(({x: xA}, {x: xB}) => {
-				if (xA > xB) return 1
-				if (xA < xB) return -1
-				return 0
-			})
-		const {x} = findClosestPoint(xPoints, +xScale.invert(mouseX))
+		const {x} = findClosestPoint(this.props.xPoints, +this.props.xScale.invert(mouseX))
 		return Number.isFinite(x) ? x : undefined
 	}
 

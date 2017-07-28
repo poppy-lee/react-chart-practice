@@ -69,6 +69,7 @@ class LinearChart extends React.Component {
 			.map((child, index) => (
 				<child.type key={`chart-${index}`} {...{
 					...chartProps[index], ...props, ...(child.props || {}),
+					points: chartProps[index].points,
 				}} />
 			))
 			.sort(({type: typeA}, {type: typeB}) => (
@@ -81,6 +82,7 @@ class LinearChart extends React.Component {
 			.map((child, index) => (
 				<child.type key={`sensor-${index}`} {...{
 					...props, ...(child.props || {}),
+					xPoints: this.getXYs().xs.map((x) => ({x})),
 					chartProps,
 				}} />
 			))
@@ -126,17 +128,17 @@ class LinearChart extends React.Component {
 		const padding = this.getPadding()
 
 		const chartWidth = width - (padding.left + padding.right)
-		const chartPixels = chartWidth * (window.devicePixelRatio || 1)
+		const chartPixels = 2 * chartWidth * (window.devicePixelRatio || 1)
 
 		return this.getChildren(["Bar", "Line"])
 			.map(({type = () => null, props = {}}, index) => (
 				props.points
+					.map(({x, y}) => ({x, y: (Math.abs(y) < MAX_VALUE ? y : Math.sign(y) * Infinity)}))
 					.sort(({x: xA}, {x: xB}) => {
 						if (xA > xB) return 1
 						if (xA < xB) return -1
 						return 0
 					})
-					.map(({x, y}) => ({x, y: (Math.abs(y) < MAX_VALUE ? y : Math.sign(y) * Infinity)}))
 					.filter((point, index) => !(
 						filter
 						&& type.name === "Line"
