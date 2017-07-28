@@ -36,6 +36,7 @@ class Line extends React.Component {
 			case 0: return {xScale, yScale}
 			case 1: return {xScale, yScale: y1Scale}
 		}
+		return {xScale, yScale}
 	}
 
 	render() {

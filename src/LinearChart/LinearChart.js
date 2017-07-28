@@ -229,6 +229,8 @@ class LinearChart extends React.Component {
 		]
 
 		switch (true) {
+			case (!y1s || !y1s.length || (!y1Min && !y1Max)):
+				return {xDomain, yDomain: [yMin, yMax], y1Domain: [0, 0]}
 			case (-yMin < yMax && -y1Min >= y1Max):
 			case (-yMin >= yMax && -y1Min < y1Max):
 				return {
@@ -257,20 +259,22 @@ class LinearChart extends React.Component {
 	}
 
 	getXYs = () => {
+		const yAxes = this.getChildren("YAxis").slice(0, 2)
 		const chartProps = this.getChildren(["Bar", "Line"])
 			.map(({props}) => (props || {}))
 
 		const xPoints = chartProps
 			.reduce((points, {pointList}) => points.concat(Immutable.List(pointList).toJS()), [])
 			.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
-		const [yPoints = [], y1Points = []] = this.getChildren("YAxis").slice(0, 2)
-			.reduce((points, {props}, index) => {
+		const [yPoints = [], y1Points = []] = (2 <= yAxes.length)
+			? yAxes.reduce((points, {props}, index) => {
 				points[index] = chartProps
 					.filter(({axis}) => (!index && !axis) || (props.name === axis))
 					.reduce((points, {pointList}) => points.concat(Immutable.List(pointList).toJS()), [])
 					.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
 				return points
 			}, [])
+			: [xPoints, xPoints]
 
 		const sort = (a, b) => {
 			if (a > b) return 1

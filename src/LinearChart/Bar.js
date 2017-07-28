@@ -30,10 +30,11 @@ class Bar extends React.Component {
 			case 0: return {xScale, yScale}
 			case 1: return {xScale, yScale: y1Scale}
 		}
+		return {xScale, yScale}
 	}
 
 	render() {
-		const {color, bandWidth, axisIndex, typeIndex, typeCount,} = this.props
+		const {color, bandWidth, axisIndex, typeIndex, typeCount} = this.props
 		const {xScale, yScale} = this.getScales()
 
 		const barPadding = bandWidth * (this.props.barPadding || 0)

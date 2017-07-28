@@ -34,8 +34,8 @@ function render() {
 				<Bar pointList={generatePointList(10)} />
 				<Bar pointList={generatePointList(20, -1)} />
 				<Bar pointList={generatePointList(30, -1)} />
-				<Line axis="percent" pointList={generatePointList(4, -1)} />
-				<Line axis="percent" pointList={generatePointList(50)} />
+				<Line axis="percent" pointList={generatePointList(40)} />
+				<Line axis="percent" pointList={generatePointList(50, -1)} />
 				<Sensor>
 					<Focus />
 					<Tooltip />
