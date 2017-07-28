@@ -28,18 +28,18 @@ function render() {
 					"#bfbfbf", "#235ef6", "#fa40a5", "#04a222", "#615d74",
 				]}
 			>
-				<YAxis name="dollars" tickPrefix="$" />
-				<YAxis name="percent" tickPostfix="%" />
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
 				<Bar points={generatePoints(10, -1)} />
-				<Bar points={generatePoints(20)} />
-				<Bar points={generatePoints(30)} />
 				<Line axis="percent" points={generatePoints(40)} />
-				<Line axis="percent" points={generatePoints(50)} />
+				<YAxis name="dollars" tickPrefix="$" />
 				<Sensor>
 					<Focus />
 					<Tooltip />
 				</Sensor>
+				<Bar points={generatePoints(20)} />
+				<YAxis name="percent" tickPostfix="%" />
+				<Bar points={generatePoints(30)} />
+				<Line axis="percent" points={generatePoints(50, -1)} />
 			</LinearChart>
 		</div>,
 		document.querySelector("#app")
