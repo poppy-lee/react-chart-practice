@@ -1,6 +1,5 @@
 
 .linear-chart .tooltip text {
 	font-size: 11px;
-	dominant-baseline: text-before-edge;
 	fill: #ffffff;
 }

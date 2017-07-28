@@ -59,7 +59,7 @@ class YAxis extends React.Component {
 			<g key={y} transform={`translate(0, ${yScale(y)})`} >
 				<line stroke="#bbbbbb" x1={x1} y1="0" x2={x2} y2="0" />
 				<text
-					x={!typeIndex ? padding.left - 5 : width - padding.right + 5}
+					x={!typeIndex ? padding.left - 5 : width - padding.right + 5} y="3"
 					textAnchor={!typeIndex ? "end" : "start"}
 				>
 					{y < 0 && "-"}{tickPrefix}{humanize(Math.abs(y))}{tickPostfix}

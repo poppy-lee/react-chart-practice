@@ -10,6 +10,3 @@
 .linear-chart > .axis.axis-x text {
 	text-anchor: middle;
 }
-.linear-chart > .axis.axis-y text {
-	dominant-baseline: middle;
-}

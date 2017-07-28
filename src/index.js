@@ -10,10 +10,12 @@ import {
 } from "./LinearChart"
 
 window.onresize = (() => render())
+	enableNodeListForEach()
 render()
 
 function render() {
-	const margin = parseMargin(window.getComputedStyle(document.body).margin)
+
+	const margin = parseMargin(window.getComputedStyle(document.body))
 	const width = (window.innerWidth || 0) - (margin.left + margin.right)
 	const height = (window.innerHeight || 0) - (margin.top + margin.bottom)
 	const padding = "30px 60px 40px"
@@ -30,11 +32,11 @@ function render() {
 				<YAxis name="dollars" tickPrefix="$" />
 				<YAxis name="percent" tickPostfix="%" />
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
-				<Bar points={generatePoints(1000, -1)} />
-				<Bar points={generatePoints(2000)} />
-				<Bar points={generatePoints(3000)} />
-				<Line axis="percent" points={generatePoints(4000)} />
-				<Line axis="percent" points={generatePoints(5000)} />
+				<Bar points={generatePoints(10, -1)} />
+				<Bar points={generatePoints(20)} />
+				<Bar points={generatePoints(30)} />
+				<Line axis="percent" points={generatePoints(40)} />
+				<Line axis="percent" points={generatePoints(50)} />
 				<Sensor>
 					<Focus />
 					<Tooltip />
@@ -43,6 +45,18 @@ function render() {
 		</div>,
 		document.querySelector("#app")
 	)
+}
+
+function enableNodeListForEach() {
+	// https://developer.mozilla.org/en-US/docs/Web/API/NodeList/forEach#Polyfill
+	if (window.NodeList && !NodeList.prototype.forEach) {
+		NodeList.prototype.forEach = function (callback, thisArg) {
+			thisArg = thisArg || window;
+			for (var i = 0; i < this.length; i++) {
+				callback.call(thisArg, this[i], i, this);
+			}
+		};
+	}
 }
 
 function generatePoints(length, sign = 1) {
@@ -55,12 +69,12 @@ function generatePoints(length, sign = 1) {
 		}))
 }
 
-function parseMargin(margin = "") {
+function parseMargin({margin, marginTop, marginRight, marginBottom, marginLeft}) {
 	const [top, right, bottom, left] = margin.split(" ")
 	return {
-		top: parseFloat(top || 0 ),
-		right: parseFloat(right || top || 0),
-		bottom: parseFloat(bottom || top || 0),
-		left: parseFloat(left || right || top || 0),
+		top: parseFloat(marginTop || top || 0 ),
+		right: parseFloat(marginRight || right || top || 0),
+		bottom: parseFloat(marginBottom || bottom || top || 0),
+		left: parseFloat(marginLeft || left || right || top || 0),
 	}
 }

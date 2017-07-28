@@ -31,6 +31,7 @@ class Tooltip extends React.Component {
 	}
 
 	padding = 10
+	textY = 9
 	lineCounts = 10
 	lineHeight = 18
 
@@ -48,7 +49,7 @@ class Tooltip extends React.Component {
 		return (
 			<g ref="tooltip" className="tooltip">
 				<rect ref="tooltip-bg" rx="5" ry="5" fill="black" opacity="0.75" />
-				{!sticky && <text x={this.padding} y={this.padding}>{x}</text>}
+				{!sticky && <text x={this.padding} y={this.padding + this.textY}>{x}</text>}
 				{ys.slice(0, this.lineCounts - shouldRenderEtc).map(this.renderLine)}
 				{shouldRenderEtc && (
 					this.renderLine({
@@ -67,8 +68,8 @@ class Tooltip extends React.Component {
 		return (
 			<g key={index} transform={`translate(${contentX}, ${contentY})`}>
 				<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
-				<text className="name" x="13">{name}</text>
-				<text className="value" textAnchor="end">
+				<text className="name" x="13" y={this.textY}>{name}</text>
+				<text className="value" y={this.textY} textAnchor="end">
 					{y < 0 && "-"}{yPrefix}{format(Math.abs(y))}{yPostfix}
 				</text>
 			</g>
@@ -86,6 +87,7 @@ class Tooltip extends React.Component {
 		const tooltipNames = tooltip.querySelectorAll(".name")
 		const tooltipValues = tooltip.querySelectorAll(".value")
 
+		tooltipBg.setAttribute("display", "none")
 		tooltipBg.setAttribute("width", 0)
 		tooltipBg.setAttribute("height", 0)
 		tooltipNames.forEach((node) => wrapText(node, 90))
@@ -100,6 +102,7 @@ class Tooltip extends React.Component {
 		const bgHeight = bottom - top + 20
 		tooltipBg.setAttribute("width", bgWidth)
 		tooltipBg.setAttribute("height", bgHeight)
+		tooltipBg.removeAttribute("display")
 
 		const tooltipX = mouseX + ((mouseX < (width + padding.left - padding.right) / 2) ? 20 : - 20 - bgWidth)
 		const tooltipY = Math.max(0, Math.min(mouseY - bgHeight / 2, height - bgHeight))
