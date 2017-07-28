@@ -3,10 +3,10 @@
 	font-family: sans-serif;
 }
 
-.linear-chart > .axis text {
+.linear-chart >.axis >.tick text {
 	font-size: 10px;
 	fill: #777777;
 }
-.linear-chart > .axis.axis-x text {
+.linear-chart >.axis.axis-x >.tick.tick-x text {
 	text-anchor: middle;
 }

@@ -56,7 +56,10 @@ class YAxis extends React.Component {
 			: (!typeIndex ? padding.left + 5 : width - padding.right)
 
 		return (
-			<g key={y} transform={`translate(0, ${yScale(y)})`} >
+			<g key={y}
+				className="tick tick-y"
+				transform={`translate(0, ${yScale(y)})`}
+			>
 				<line stroke="#bbbbbb" x1={x1} y1="0" x2={x2} y2="0" />
 				<text
 					x={!typeIndex ? padding.left - 5 : width - padding.right + 5} y="3"

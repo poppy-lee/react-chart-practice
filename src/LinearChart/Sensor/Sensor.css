@@ -1,0 +1,17 @@
+
+.linear-chart .sensor {
+	pointer-events: all;
+}
+.linear-chart .sensor .focus,
+.linear-chart .sensor .tooltip {
+	pointer-events: none;
+}
+
+.linear-chart .sensor >rect {
+	fill: none;
+}
+
+.linear-chart .sensor .tooltip text {
+	font-size: 11px;
+	fill: #ffffff;
+}

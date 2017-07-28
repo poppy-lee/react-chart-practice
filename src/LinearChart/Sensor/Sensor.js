@@ -1,3 +1,5 @@
+import "./Sensor.css"
+
 import PropTypes from "prop-types"
 import React from "react"
 
@@ -76,15 +78,12 @@ class Sensor extends React.Component {
 
 		return (
 			<g
-				style={{pointerEvents: "all"}}
+				className="sensor"
 				onMouseEnter={this.onMouseEvent}
 				onMouseMove={this.onMouseEvent}
 				onMouseLeave={() => this.setState(initialState)}
 			>
-				<rect ref="sensor"
-					width={String(width)} height={String(height)}
-					style={{fill: "none"}}
-				/>
+				<rect ref="sensor" width={String(width)} height={String(height)} />
 				{this.renderChildComponents({...this.props, ...this.state})}
 			</g>
 		)

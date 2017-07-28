@@ -41,7 +41,7 @@ class Bar extends React.Component {
 	render() {
 
 		return (
-			<g>
+			<g className="bar">
 				{this.props.points.map(this.renderBar)}
 			</g>
 		)

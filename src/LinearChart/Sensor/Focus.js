@@ -35,7 +35,7 @@ class Focus extends React.Component {
 		} = this.props
 
 		return (
-			<g style={{pointerEvents: "none"}}>
+			<g className="focus">
 				{!sticky && (
 					<line
 						stroke="#777777"
