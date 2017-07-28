@@ -1,7 +1,5 @@
 import * as d3 from "d3"
 
-import Immutable from "immutable"
-import ImmutablePropTypes from "react-immutable-proptypes"
 import PropTypes from "prop-types"
 import React from "react"
 
@@ -13,7 +11,13 @@ class Line extends React.Component {
 		yScale: PropTypes.func,
 		y1Scale: PropTypes.func,
 
-		pointList: ImmutablePropTypes.list.isRequired,
+		points: PropTypes.arrayOf(
+			PropTypes.shape({
+				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+			})
+		).isRequired,
+
 		name: PropTypes.string,
 		color: PropTypes.string,
 		lineWidth: PropTypes.number,
@@ -59,33 +63,30 @@ class Line extends React.Component {
 		const {color, lineWidth, axisIndex} = this.props
 		const {xScale, yScale} = this.getScales()
 
-		return this.props.pointList
-			.filter((point, index, pointList) => (
-				Number.isFinite(point.get("y")) && !(
-					index
-					&& Number.isFinite(pointList.getIn([index - 1, "y"]))
-					&& Number.isFinite(pointList.getIn([index + 1, "y"]))
+		return this.props.points
+			.filter(({y}, index) => {
+				const {y: prevY} = (this.props.points[index - 1] || {})
+				const {y: nextY} = (this.props.points[index + 1] || {})
+				return !index || (
+					Number.isFinite(y) && !(Number.isFinite(prevY) && Number.isFinite(nextY))
 				)
-			))
-			.map((point, index) => (
+			})
+			.map(({x, y}, index) => (
 				<circle key={index}
+					r={lineWidth} cx={xScale(x)} cy={yScale(y)}
 					fill={color}
-					r={lineWidth}
-					cx={xScale(point.get("x"))}
-					cy={yScale(point.get("y"))}
 				/>
 			))
 	}
 
-	getDescription = (pointList = this.props.pointList) => {
+	getDescription = (points = this.props.points) => {
 		const {xScale, yScale} = this.getScales()
-
 		return (
 			d3.line()
 				.defined((point) => point && Number.isFinite(point.y))
 				.x(({x}) => xScale(x))
 				.y(({y}) => yScale(y))
-		) (pointList.toJS())
+		) (points)
 	}
 
 }

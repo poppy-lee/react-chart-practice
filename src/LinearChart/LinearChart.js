@@ -2,7 +2,6 @@ import "./LinearChart.css"
 
 import * as d3 from "d3"
 
-import Immutable from "immutable"
 import PropTypes from "prop-types"
 import React from "react"
 
@@ -19,13 +18,13 @@ class LinearChart extends React.Component {
 		paddingRight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		paddingBottom: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		paddingLeft: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-		colorArray: PropTypes.array,
+		colors: PropTypes.array,
 	}
 
 	static defaultProps = {
 		width: 0,
 		height: 0,
-		colorArray: d3.schemeCategory10,
+		colors: d3.schemeCategory10,
 	}
 
   render() {
@@ -82,7 +81,6 @@ class LinearChart extends React.Component {
 			.map((child, index) => (
 				<child.type key={`sensor-${index}`} {...{
 					...props, ...(child.props || {}),
-					...this.getXYs(),
 					chartProps,
 				}} />
 			))
@@ -96,9 +94,9 @@ class LinearChart extends React.Component {
 	}
 
 	getChartProps = (filter = false) => {
-		const {colorArray} = this.props
+		const {colors} = this.props
 		const bandWidth = this.getBandWidth()
-		const pointLists = this.getPointLists(filter)
+		const pointsArray = this.getPointsArray(filter)
 		const axisProps = this.getChildren("YAxis").slice(0, 2)
 			.map(({props = {}}, index, axes) => ({
 				axis: props.name, axisIndex: index, axisCount: axes.length,
@@ -110,10 +108,10 @@ class LinearChart extends React.Component {
 		return this.getChildren(["Bar", "Line"])
 			.map(({type = () => null, props = {}}, index) => Object.assign({
 				name: `y${index + 1}`,
-				color: colorArray[index % colorArray.length],
+				color: colors[index % colors.length],
 				bandWidth,
 				...props,
-				pointList: pointLists[index],
+				points: pointsArray[index],
 				type: type.name,
 				typeIndex: (typeCounts[type.name] = (typeCounts[type.name] || 0) + 1) - 1,
 			}))
@@ -123,7 +121,7 @@ class LinearChart extends React.Component {
 				...(axisProps.find(({axis}) => props.axis === axis) || axisProps[0] || {}),
 			}))
 	}
-	getPointLists = (filter = false) => {
+	getPointsArray = (filter = false) => {
 		const {width} = this.props
 		const padding = this.getPadding()
 
@@ -132,22 +130,19 @@ class LinearChart extends React.Component {
 
 		return this.getChildren(["Bar", "Line"])
 			.map(({type = () => null, props = {}}, index) => (
-				props.pointList
-					.sort((pointA, pointB) => {
-						if (pointA.get("x") > pointB.get("x")) return 1
-						if (pointA.get("x") < pointB.get("x")) return -1
+				props.points
+					.sort(({x: xA}, {x: xB}) => {
+						if (xA > xB) return 1
+						if (xA < xB) return -1
 						return 0
 					})
-					.map((point) => {
-						const y = point.get("y")
-						return point.set("y", (Math.abs(y) < MAX_VALUE ? y : Math.sign(y) * Infinity))
-					})
+					.map(({x, y}) => ({x, y: (Math.abs(y) < MAX_VALUE ? y : Math.sign(y) * Infinity)}))
 					.filter((point, index) => !(
 						filter
 						&& type.name === "Line"
-						&& point && Number.isFinite(point.get("x")) && isFinite(point.get("y"))
-						&& index && index !== props.pointList.size - 1
-						&& Math.floor(Math.random() * (props.pointList.size / chartPixels))
+						&& point && Number.isFinite(point.x) && isFinite(point.y)
+						&& index && index !== props.points.length - 1
+						&& Math.floor(Math.random() * (props.points.length / chartPixels))
 					))
 			))
 	}
@@ -172,7 +167,7 @@ class LinearChart extends React.Component {
 		const {xScale} = this.getScales()
 		const xs = [...new Set(
 			this.getChildren("Bar")
-				.reduce((points, {props = {}}) => points.concat(props.pointList.toJS()), [])
+				.reduce((points, {props = {}}) => points.concat(props.points), [])
 				.filter((point) => point && Number.isFinite(point.x) && !isNaN(point.y))
 				.map(({x}) => x || 0)
 		)]
@@ -263,18 +258,18 @@ class LinearChart extends React.Component {
 		const chartProps = this.getChildren(["Bar", "Line"])
 			.map(({props}) => (props || {}))
 
-		const xPoints = chartProps
-			.reduce((points, {pointList}) => points.concat(Immutable.List(pointList).toJS()), [])
+		const points = chartProps
+			.reduce((points, props) => points.concat(props.points), [])
 			.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
 		const [yPoints = [], y1Points = []] = (2 <= yAxes.length)
 			? yAxes.reduce((points, {props}, index) => {
 				points[index] = chartProps
 					.filter(({axis}) => (!index && !axis) || (props.name === axis))
-					.reduce((points, {pointList}) => points.concat(Immutable.List(pointList).toJS()), [])
+					.reduce((points, props) => points.concat(props.points), [])
 					.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
 				return points
 			}, [])
-			: [xPoints, xPoints]
+			: [points, points]
 
 		const sort = (a, b) => {
 			if (a > b) return 1
@@ -283,7 +278,7 @@ class LinearChart extends React.Component {
 		}
 
 		return {
-			xs: [...new Set(xPoints.map(({x}) => x))].sort(sort),
+			xs: [...new Set(points.map(({x}) => x))].sort(sort),
 			ys: [...new Set(yPoints.map(({y}) => y))].sort(sort),
 			y1s: [...new Set(y1Points.map(({y}) => y))].sort(sort),
 		}

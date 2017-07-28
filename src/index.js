@@ -1,4 +1,3 @@
-import Immutable from "immutable"
 import React from "react"
 import ReactDOM from "react-dom"
 
@@ -23,7 +22,7 @@ function render() {
 		<div style={{fontSize: 0}}>
 			<LinearChart
 				width={width} height={height} padding={padding}
-				colorArray={[
+				colors={[
 					"#3baeda", "#8cc054", "#f6bb43", "#f66043", "#8679c5",
 					"#bfbfbf", "#235ef6", "#fa40a5", "#04a222", "#615d74",
 				]}
@@ -31,11 +30,11 @@ function render() {
 				<YAxis name="dollars" tickPrefix="$" />
 				<YAxis name="percent" tickPostfix="%" />
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
-				<Bar pointList={generatePointList(10)} />
-				<Bar pointList={generatePointList(20, -1)} />
-				<Bar pointList={generatePointList(30, -1)} />
-				<Line axis="percent" pointList={generatePointList(40)} />
-				<Line axis="percent" pointList={generatePointList(50, -1)} />
+				<Bar points={generatePoints(10, -1)} />
+				<Bar points={generatePoints(20)} />
+				<Bar points={generatePoints(30)} />
+				<Line axis="percent" points={generatePoints(40)} />
+				<Line axis="percent" points={generatePoints(50)} />
 				<Sensor>
 					<Focus />
 					<Tooltip />
@@ -46,15 +45,14 @@ function render() {
 	)
 }
 
-function generatePointList(length, sign = 1) {
-	return Immutable.List([...Array(Math.abs(length) + 1)])
-		.map((undef, index) => {
-			const x = index - length / 2
-			const y = 0.1 < Math.random()
+function generatePoints(length, sign = 1) {
+	return [...Array(Math.abs(length) + 1)]
+		.map((undef, index) => ({
+			x: index - length / 2,
+			y: (0.1 < Math.random())
 				? Math.sign(sign) * length * Math.random()
-				: null
-			return Immutable.Map({x, y})
-		})
+				: null ,
+		}))
 }
 
 function parseMargin(margin = "") {

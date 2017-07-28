@@ -10,12 +10,10 @@
   },
   "dependencies": {
     "d3": "^4.10.0",
-    "immutable": "^3.8.1",
     "numeral": "^2.0.6",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1",
-    "react-immutable-proptypes": "^2.1.0"
+    "react-dom": "^15.6.1"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

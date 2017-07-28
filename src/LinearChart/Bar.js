@@ -1,4 +1,3 @@
-import ImmutablePropTypes from "react-immutable-proptypes"
 import PropTypes from "prop-types"
 import React from "react"
 
@@ -10,12 +9,18 @@ class Bar extends React.Component {
 		yScale: PropTypes.func,
 		y1Scale: PropTypes.func,
 
-		pointList: ImmutablePropTypes.list.isRequired,
+		points: PropTypes.arrayOf(
+			PropTypes.shape({
+				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+			})
+		).isRequired,
+
 		name: PropTypes.string,
 		color: PropTypes.string,
 		barPadding: PropTypes.number,
-
 		bandWidth: PropTypes.number,
+
 		axix: PropTypes.string,
 		axisIndex: PropTypes.number,
 		axisCount: PropTypes.number,
@@ -34,32 +39,33 @@ class Bar extends React.Component {
 	}
 
 	render() {
-		const {color, bandWidth, axisIndex, typeIndex, typeCount} = this.props
-		const {xScale, yScale} = this.getScales()
-
-		const barPadding = bandWidth * (this.props.barPadding || 0)
-		const barWidth = Math.max(
-			1 / (window.devicePixelRatio || 1),
-			(bandWidth / typeCount) - 2 * barPadding,
-		)
 
 		return (
 			<g>
-				{this.props.pointList
-					.map((point) => {
-						const height = yScale(point.get("y")) - yScale(0)
-						return (
-							<rect key={point.get("x")}
-								fill={color}
-								width={barWidth}
-								height={Math.abs(height)}
-								x={(xScale(point.get("x")) - bandWidth / 2) + (bandWidth / typeCount * typeIndex) + barPadding}
-								y={height < 0 ? yScale(point.get("y")) : yScale(0)}
-							/>
-						)
-					})
-				}
+				{this.props.points.map(this.renderBar)}
 			</g>
+		)
+	}
+
+	renderBar = ({x, y}) => {
+		const {color, bandWidth, axisIndex, typeIndex, typeCount} = this.props
+		const {xScale, yScale} = this.getScales()
+
+		const padding = bandWidth * (this.props.barPadding || 0)
+		const width = Math.max(
+			1 / (window.devicePixelRatio || 1),
+			(bandWidth / typeCount) - 2 * padding,
+		)
+		const height = yScale(y) - yScale(0)
+
+		return (
+			<rect key={x}
+				fill={color}
+				width={width}
+				height={Math.abs(height)}
+				x={(xScale(x) - bandWidth / 2) + (bandWidth / typeCount * typeIndex) + padding}
+				y={height < 0 ? yScale(y) : yScale(0)}
+			/>
 		)
 	}
 

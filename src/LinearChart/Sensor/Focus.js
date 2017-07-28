@@ -1,4 +1,3 @@
-import ImmutablePropTypes from "react-immutable-proptypes"
 import PropTypes from "prop-types"
 import React from "react"
 
