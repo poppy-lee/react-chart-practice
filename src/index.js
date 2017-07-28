@@ -1,3 +1,5 @@
+import "babel-polyfill"
+
 import React from "react"
 import ReactDOM from "react-dom"
 
@@ -10,7 +12,7 @@ import {
 } from "./LinearChart"
 
 window.onresize = (() => render())
-	enableNodeListForEach()
+enableNodeListForEach()
 render()
 
 function render() {
@@ -47,18 +49,6 @@ function render() {
 	)
 }
 
-function enableNodeListForEach() {
-	// https://developer.mozilla.org/en-US/docs/Web/API/NodeList/forEach#Polyfill
-	if (window.NodeList && !NodeList.prototype.forEach) {
-		NodeList.prototype.forEach = function (callback, thisArg) {
-			thisArg = thisArg || window;
-			for (var i = 0; i < this.length; i++) {
-				callback.call(thisArg, this[i], i, this);
-			}
-		};
-	}
-}
-
 function generatePoints(length, sign = 1) {
 	return [...Array(Math.abs(length) + 1)]
 		.map((undef, index) => ({
@@ -76,5 +66,17 @@ function parseMargin({margin, marginTop, marginRight, marginBottom, marginLeft})
 		right: parseFloat(marginRight || right || top || 0),
 		bottom: parseFloat(marginBottom || bottom || top || 0),
 		left: parseFloat(marginLeft || left || right || top || 0),
+	}
+}
+
+function enableNodeListForEach() {
+	// https://developer.mozilla.org/en-US/docs/Web/API/NodeList/forEach#Polyfill
+	if (window.NodeList && !NodeList.prototype.forEach) {
+		NodeList.prototype.forEach = function (callback, thisArg) {
+			thisArg = thisArg || window;
+			for (var i = 0; i < this.length; i++) {
+				callback.call(thisArg, this[i], i, this);
+			}
+		};
 	}
 }
