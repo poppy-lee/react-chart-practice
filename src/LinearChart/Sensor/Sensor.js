@@ -21,6 +21,7 @@ class Sensor extends React.Component {
 		yScale: PropTypes.func,
 		y1Scale: PropTypes.func,
 
+		xFormat: PropTypes.func,
 		xPoints: PropTypes.array,
 		chartProps: PropTypes.arrayOf(
 			PropTypes.shape({

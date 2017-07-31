@@ -10,8 +10,7 @@ class Tooltip extends React.Component {
 		width: PropTypes.number,
 		height: PropTypes.number,
 		padding: PropTypes.object,
-		xScale: PropTypes.func,
-		yScale: PropTypes.func,
+		xFormat: PropTypes.func,
 
 		sticky: PropTypes.bool,
 		mouseX: PropTypes.number,
@@ -43,11 +42,16 @@ class Tooltip extends React.Component {
 
 	render() {
 		const {sticky, x, ys} = this.props
+		const xFormat = this.props.xFormat || ((x) => x)
 		const shouldRenderEtc = !!ys.slice(this.lineCounts).length
 		return (
 			<g ref="tooltip" className="tooltip">
 				<rect ref="tooltip-bg" rx="5" ry="5" fill="black" opacity="0.75" />
-				{!sticky && <text x={this.padding} y={this.padding + this.textY}>{x}</text>}
+				{!sticky && (
+					<text x={this.padding} y={this.padding + this.textY}>
+						{xFormat(x)}
+					</text>
+				)}
 				{ys.slice(0, this.lineCounts - shouldRenderEtc).map(this.renderLine)}
 				{shouldRenderEtc && (
 					this.renderLine({

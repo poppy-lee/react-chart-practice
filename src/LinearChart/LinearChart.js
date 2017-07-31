@@ -83,10 +83,13 @@ class LinearChart extends React.Component {
 	}
 	renderSensor = (props = {}) => {
 		const chartProps = this.getChartProps()
+		const [xFormat] = this.getChildren("XAxis")
+			.map(({props = {}}) => props.tickFormat)
 		return this.getChildren("Sensor")
 			.map((child, index) => (
 				<child.type key={`sensor-${index}`} {...{
 					...props, ...(child.props || {}),
+					xFormat,
 					xPoints: this.getXYs().xs.map((x) => ({x})),
 					chartProps,
 				}} />
@@ -268,7 +271,7 @@ class LinearChart extends React.Component {
 		const points = chartProps
 			.reduce((points, props) => points.concat(props.points), [])
 			.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
-		const [yPoints = [], y1Points = []] = (2 <= yAxes.length)
+		const [yPoints, y1Points] = (yAxes.length === 2)
 			? yAxes.reduce((points, {props}, index) => {
 				points[index] = chartProps
 					.filter(({axis}) => (!index && !axis) || (props.name === axis))
@@ -276,7 +279,7 @@ class LinearChart extends React.Component {
 					.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
 				return points
 			}, [])
-			: [points, points]
+			: [points, []]
 
 		const sort = (a, b) => {
 			if (a > b) return 1
