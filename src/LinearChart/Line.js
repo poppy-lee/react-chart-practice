@@ -72,7 +72,7 @@ class Line extends React.Component {
 			.map(({x, y}, index) => (
 				<circle key={index}
 					r={lineWidth} cx={xScale(x)} cy={yScale(y)}
-					fill={color}
+					stroke="none" fill={color}
 				/>
 			))
 	}
