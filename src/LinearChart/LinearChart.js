@@ -141,6 +141,8 @@ class LinearChart extends React.Component {
 		return this.getChildren(["Bar", "Line"])
 			.map(({type = () => null, props = {}}, index) => (
 				props.points
+					.filter((point) => point instanceof Object)
+					.filter(({x, y}) => Number.isFinite(x))
 					.map(({x, y}) => ({x, y: (Math.abs(y) < MAX_VALUE ? y : Math.sign(y) * Infinity)}))
 					.sort(({x: xA}, {x: xB}) => {
 						if (xA > xB) return 1
@@ -148,9 +150,7 @@ class LinearChart extends React.Component {
 						return 0
 					})
 					.filter((point, index) => !(
-						filter
-						&& type.name === "Line"
-						&& point && Number.isFinite(point.x) && isFinite(point.y)
+						filter && type.name === "Line" && isFinite(point.y)
 						&& index && index !== props.points.length - 1
 						&& Math.floor(Math.random() * (props.points.length / chartPixels))
 					))

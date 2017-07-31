@@ -72,7 +72,10 @@ class Tooltip extends React.Component {
 				<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
 				<text className="name" x="13" y={this.textY}>{name}</text>
 				<text className="value" y={this.textY} textAnchor="end">
-					{y < 0 && "-"}{yPrefix}{format(Math.abs(y))}{yPostfix}
+					{y < 0 && "-"}
+					{Number.isFinite(y) && yPrefix}
+					{format(Math.abs(y))}
+					{Number.isFinite(y) && yPostfix}
 				</text>
 			</g>
 		)

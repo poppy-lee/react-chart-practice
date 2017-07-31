@@ -62,7 +62,7 @@ class Sensor extends React.Component {
 					: findPoint(props.points, x)
 				return {...props, ...(point || {})}
 			})
-			.filter(({x, y}) => Number.isFinite(x) && Number.isFinite(y))
+			.filter(({x, y}) => Number.isFinite(x) && (y !== undefined && y !== null))
 	}
 
 	onMouseEvent = ({clientX, clientY}) => {

@@ -42,7 +42,10 @@ class Bar extends React.Component {
 
 		return (
 			<g className="bar">
-				{this.props.points.map(this.renderBar)}
+				{this.props.points
+					.filter(({y}) => Number.isFinite(y))
+					.map(this.renderBar)
+				}
 			</g>
 		)
 	}

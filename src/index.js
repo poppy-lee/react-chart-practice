@@ -48,12 +48,16 @@ function render() {
 
 function generatePoints(length, sign = 1) {
 	return [...Array(Math.abs(length) + 1)]
-		.map((undef, index) => ({
-			x: index - length / 2,
-			y: (0.1 < Math.random())
-				? Math.sign(sign) * length * Math.random()
-				: null ,
-		}))
+		.map((undef, index) => (0.1 < Math.random())
+			? {
+				x: index - length / 2,
+				y: (0.1 < Math.random())
+					? Math.sign(sign) * length * Math.random()
+					// : null
+					: Math.sign(sign) * Infinity,
+			}
+			: null
+		)
 }
 
 function parseMargin({margin, marginTop, marginRight, marginBottom, marginLeft}) {
