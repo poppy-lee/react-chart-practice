@@ -82,16 +82,14 @@ class LinearChart extends React.Component {
 			))
 	}
 	renderSensor = (props = {}) => {
-		const chartProps = this.getChartProps()
 		const [xFormat] = this.getChildren("XAxis")
 			.map(({props = {}}) => props.tickFormat)
+		const points = this.getAllPoints()
 		return this.getChildren("Sensor")
 			.map((child, index) => (
 				<child.type key={`sensor-${index}`} {...{
 					...props, ...(child.props || {}),
-					xFormat,
-					xPoints: this.getXYs().xs.map((x) => ({x})),
-					chartProps,
+					xFormat, points,
 				}} />
 			))
 	}
@@ -116,7 +114,7 @@ class LinearChart extends React.Component {
 		const typeCounts = {}
 
 		return this.getChildren(["Bar", "Line"])
-			.map(({type = () => null, props = {}}, index) => Object.assign({
+			.map(({type = () => null, props = {}}, index) => ({
 				name: `y${index + 1}`,
 				color: colors[index % colors.length],
 				bandWidth,
@@ -155,6 +153,27 @@ class LinearChart extends React.Component {
 						&& Math.floor(Math.random() * (props.points.length / chartPixels))
 					))
 			))
+	}
+
+	getAllPoints = () => {
+		const chartProps = this.getChartProps()
+		const xs = [...new Set(
+			chartProps
+			.reduce((xs, {points}) => [
+				...xs, ...points.filter((point) => point && Number.isFinite(point.x)).map(({x}) => x)
+			], [])
+			.sort((xA, xB) => xA - xB)
+		)]
+		return xs.map((x) => ({
+			x,
+			ys: chartProps
+				.reduce((ys, {name, color, axis, axisIndex, axisCount, points = []}) => {
+					const point = findPoint(points, x)
+					if (point && Number.isFinite(point.x))
+						ys.push({name, color, axis, axisIndex, axisCount, ...point})
+					return ys
+				}, [])
+		}))
 	}
 
 	getPadding = () => {
@@ -213,7 +232,6 @@ class LinearChart extends React.Component {
 				.range([height - padding.bottom, padding.top]),
 		}
 	}
-
 	getDomains = () => {
 		const {xs, ys, y1s} = this.getXYs()
 		const intervals = xs
@@ -262,24 +280,40 @@ class LinearChart extends React.Component {
 				}
 		}
 	}
-
 	getXYs = () => {
-		const yAxes = this.getChildren("YAxis").slice(0, 2)
 		const chartProps = this.getChildren(["Bar", "Line"])
 			.map(({props}) => (props || {}))
-
 		const points = chartProps
 			.reduce((points, props) => points.concat(props.points), [])
 			.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
-		const [yPoints, y1Points] = (yAxes.length === 2)
-			? yAxes.reduce((points, {props}, index) => {
-				points[index] = chartProps
-					.filter(({axis}) => (!index && !axis) || (props.name === axis))
-					.reduce((points, props) => points.concat(props.points), [])
-					.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
-				return points
+
+		const xAxes = this.getChildren("XAxis").slice(0, 1)
+		const yAxes = this.getChildren("YAxis").slice(0, 2)
+		const [xs] = (xAxes.length)
+			? xAxes.reduce((xsArray, {props: axisProps = {}}, index) => {
+				xsArray[index] = chartProps
+					.reduce((xs, props) => [
+						...xs, ...(axisProps.tickValues || []),
+						...(props.points || [])
+							.filter((point) => point && Number.isFinite(point.x))
+							.map(({x, y}) => x),
+					], [])
+				return xsArray
 			}, [])
-			: [points, []]
+			: [points.map(({x}) => x)]
+		const [ys, y1s] = (yAxes.length === 2)
+			? yAxes.reduce((ysArray, {props: axisProps = {}}, index) => {
+				ysArray[index] = chartProps
+					.filter(({axis}) => (!index && !axis) || (axisProps.name === axis))
+					.reduce((ys, props) => [
+						...ys, ...(axisProps.tickValues || []),
+						...(props.points || [])
+							.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
+							.map(({x, y}) => y),
+					], [])
+				return ysArray
+			}, [])
+			: [points.map(({y}) => y), []]
 
 		const sort = (a, b) => {
 			if (a > b) return 1
@@ -288,9 +322,9 @@ class LinearChart extends React.Component {
 		}
 
 		return {
-			xs: [...new Set(points.map(({x}) => x))].sort(sort),
-			ys: [...new Set(yPoints.map(({y}) => y))].sort(sort),
-			y1s: [...new Set(y1Points.map(({y}) => y))].sort(sort),
+			xs: [...new Set(xs)].sort(sort),
+			ys: [...new Set(ys)].sort(sort),
+			y1s: [...new Set(y1s)].sort(sort),
 		}
 	}
 
@@ -307,4 +341,17 @@ function enableNodeListForEach() {
 			}
 		};
 	}
+}
+
+function findPoint(points, x, leftIdx, rightIdx) {
+	leftIdx = Number.isFinite(leftIdx) ? leftIdx : 0
+	rightIdx = Number.isFinite(rightIdx) ?  rightIdx : points.length - 1
+
+	const midIdx = Math.floor((rightIdx + leftIdx) / 2)
+	const point = points[midIdx] || {}
+
+	if (point.x === x) return point
+	if (leftIdx >= rightIdx) return undefined
+	if (point.x < x) return findPoint(points, x, midIdx + 1, rightIdx)
+	if (point.x > x) return findPoint(points, x, leftIdx, midIdx)
 }

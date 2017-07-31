@@ -22,54 +22,20 @@ class Sensor extends React.Component {
 		y1Scale: PropTypes.func,
 
 		xFormat: PropTypes.func,
-		xPoints: PropTypes.array,
-		chartProps: PropTypes.arrayOf(
-			PropTypes.shape({
-				name: PropTypes.string,
-				color: PropTypes.string,
-				bandWidth: PropTypes.number,
-				points: PropTypes.array.isRequired,
-
-				axix: PropTypes.string,
-				axisIndex: PropTypes.number,
-				axisCount: PropTypes.number,
-				yPrefix: PropTypes.any,
-				yPostfix: PropTypes.any,
-
-				type: PropTypes.string,
-				typeIndex: PropTypes.number,
-				typeCount: PropTypes.number,
-			})
-		),
-
-		sticky: PropTypes.bool,
+		points: PropTypes.array,
 	}
 
 	state = initialState
 
-	getX = (mouseX) => {
-		const {x} = findClosestPoint(this.props.xPoints, +this.props.xScale.invert(mouseX))
-		return Number.isFinite(x) ? x : undefined
-	}
-
-	getYs = (mouseX) => {
-		const {chartProps} = this.props
-		const x = this.getX(mouseX)
-		return chartProps
-			.map((props, index) => {
-				const point = this.props.sticky
-					? findClosestPoint(props.points, x)
-					: findPoint(props.points, x)
-				return {...props, ...(point || {})}
-			})
-			.filter(({x, y}) => Number.isFinite(x) && (y !== undefined && y !== null))
+	findPoint = (mouseX) => {
+		const point = findClosestPoint(this.props.points, +this.props.xScale.invert(mouseX))
+		return point && Number.isFinite(point.x) ? point : {}
 	}
 
 	onMouseEvent = ({clientX, clientY}) => {
 		const mouseX = clientX - this.refs["sensor"].getBoundingClientRect().left
 		const mouseY = clientY - this.refs["sensor"].getBoundingClientRect().top
-		const x = this.getX(mouseX)
-		const ys = this.getYs(mouseX)
+		const {x, ys} = this.findPoint(mouseX)
 
 		this.setState({mouseX, mouseY, x, ys})
 	}
@@ -105,19 +71,6 @@ class Sensor extends React.Component {
 			: null
 	}
 
-}
-
-function findPoint(points, x, leftIdx, rightIdx) {
-	leftIdx = Number.isFinite(leftIdx) ? leftIdx : 0
-	rightIdx = Number.isFinite(rightIdx) ?  rightIdx : points.length - 1
-
-	const midIdx = Math.floor((rightIdx + leftIdx) / 2)
-	const point = points[midIdx] || {}
-
-	if (point.x === x) return point
-	if (leftIdx >= rightIdx) return undefined
-	if (point.x < x) return findPoint(points, x, midIdx + 1, rightIdx)
-	if (point.x > x) return findPoint(points, x, leftIdx, midIdx)
 }
 
 function findClosestPoint(points, x, closestPoint, leftIdx, rightIdx) {

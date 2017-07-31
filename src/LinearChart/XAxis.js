@@ -13,11 +13,12 @@ class XAxis extends React.Component {
 
 		ticks: PropTypes.number,
 		tickFormat: PropTypes.func,
+		tickValues: PropTypes.array,
 	}
 
 	render() {
-		const {width, padding, xScale, yScale, ticks} = this.props
-		const xTicks = xScale.ticks(Number.isFinite(ticks) ? ticks : 10)
+		const {width, padding, xScale, yScale, ticks, tickValues} = this.props
+		const xTicks = tickValues || xScale.ticks(Number.isFinite(ticks) ? ticks : 10)
 		return (
 			<g className="axis axis-x">
 				<line stroke="#bbbbbb" strokeWidth="2"
