@@ -3,6 +3,7 @@ import LinearChart from "./LinearChart"
 import XAxis from "./XAxis"
 import YAxis from "./YAxis"
 
+import Area from "./Area"
 import Bar from "./Bar"
 import Line from "./Line"
 
@@ -14,7 +15,7 @@ export default LinearChart
 export {
 	LinearChart,
 		XAxis, YAxis,
-		Bar, Line,
+		Area, Bar, Line,
 		Sensor,
 			Focus, Tooltip
 }

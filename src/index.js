@@ -4,7 +4,7 @@ import ReactDOM from "react-dom"
 import {
 	LinearChart,
 		XAxis, YAxis,
-		Bar, Line,
+		Area, Bar, Line,
 		Sensor,
 			Focus, Tooltip
 } from "./LinearChart"
@@ -34,7 +34,9 @@ function render() {
 				<Bar points={generatePoints(10, -1)} />
 				<Bar points={generatePoints(20)} />
 				<Bar points={generatePoints(30)} />
-				<Line axis="percent" points={generatePoints(4000)} />
+				<Area axis="percent"
+					points={[...new Array(2500)].map((undef, index) => ({x: index, y: index}))}
+				/>
 				<Line axis="percent" points={generatePoints(5000, -1)} />
 				<Sensor>
 					<Focus />
@@ -47,7 +49,7 @@ function render() {
 }
 
 function generatePoints(length, sign = 1) {
-	return [...Array(Math.abs(length) + 1)]
+	return [...new Array(Math.abs(length) + 1)]
 		.map((undef, index) => (0.1 < Math.random())
 			? {
 				x: index - length / 2,

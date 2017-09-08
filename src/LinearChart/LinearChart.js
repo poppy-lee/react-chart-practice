@@ -7,6 +7,7 @@ import PropTypes from "prop-types"
 import React from "react"
 
 const MAX_VALUE = Number.MAX_VALUE / 2
+const CHART_TYPES = ["Area", "Bar", "Line"]
 
 export default
 class LinearChart extends React.Component {
@@ -69,8 +70,7 @@ class LinearChart extends React.Component {
 	}
 	renderCharts = (props = {}) => {
 		const chartProps = this.getChartProps(true)
-		const chartTypes = ["Bar", "Line"]
-		return this.getChildren(chartTypes)
+		return this.getChildren(CHART_TYPES)
 			.map((child, index) => (
 				<child.type key={`chart-${index}`} {...{
 					...chartProps[index], ...props, ...(child.props || {}),
@@ -78,7 +78,7 @@ class LinearChart extends React.Component {
 				}} />
 			))
 			.sort(({type: typeA}, {type: typeB}) => (
-				chartTypes.indexOf(typeA.name) - chartTypes.indexOf(typeB.name)
+				CHART_TYPES.indexOf(typeA.name) - CHART_TYPES.indexOf(typeB.name)
 			))
 	}
 	renderSensor = (props = {}) => {
@@ -101,10 +101,10 @@ class LinearChart extends React.Component {
 			.filter(({type = () => null}) => !types.length || types.includes(type.name))
 	}
 
-	getChartProps = (filter = false) => {
+	getChartProps = () => {
 		const {colors} = this.props
 		const bandWidth = this.getBandWidth()
-		const pointsArray = this.getPointsArray(filter)
+		const pointsArray = this.getPointsArray()
 		const axisProps = this.getChildren("YAxis").slice(0, 2)
 			.map(({props = {}}, index, axes) => ({
 				axis: props.name, axisIndex: index, axisCount: axes.length,
@@ -113,7 +113,7 @@ class LinearChart extends React.Component {
 			}))
 		const typeCounts = {}
 
-		return this.getChildren(["Bar", "Line"])
+		return this.getChildren(CHART_TYPES)
 			.map(({type = () => null, props = {}}, index) => ({
 				name: `y${index + 1}`,
 				color: colors[index % colors.length],
@@ -129,14 +129,14 @@ class LinearChart extends React.Component {
 				...(axisProps.find(({axis}) => props.axis === axis) || axisProps[0] || {}),
 			}))
 	}
-	getPointsArray = (filter = false) => {
+	getPointsArray = () => {
 		const {width} = this.props
 		const padding = this.getPadding()
 
 		const chartWidth = width - (padding.left + padding.right)
 		const chartPixels = 2 * chartWidth * (window.devicePixelRatio || 1)
 
-		return this.getChildren(["Bar", "Line"])
+		return this.getChildren(CHART_TYPES)
 			.map(({type = () => null, props = {}}, index) => (
 				props.points
 					.filter((point) => point instanceof Object)
@@ -147,11 +147,6 @@ class LinearChart extends React.Component {
 						if (xA < xB) return -1
 						return 0
 					})
-					.filter((point, index) => !(
-						filter && type.name === "Line" && isFinite(point.y)
-						&& index && index !== props.points.length - 1
-						&& Math.floor(Math.random() * (props.points.length / chartPixels))
-					))
 			))
 	}
 
@@ -220,8 +215,14 @@ class LinearChart extends React.Component {
 		const padding = this.getPadding()
 		const {xDomain, yDomain, y1Domain} = this.getDomains()
 
+		const {xs} = this.getXYs()
+		const dayInterval = 1000 * 60 * 60 * 24
+		const intervals = xs
+			.map((x, index, xs) => Math.abs(x - (xs[index - 1] || 0)))
+			.filter((interval) => interval)
+
 		return {
-			xScale: d3.scaleLinear()
+			xScale: ((Math.min(...intervals) % dayInterval) ? d3.scaleLinear() : d3.scaleUtc())
 				.domain(xDomain)
 				.range([padding.left + 10, width - (padding.right + 10)]),
 			yScale: d3.scaleLinear()
@@ -234,9 +235,6 @@ class LinearChart extends React.Component {
 	}
 	getDomains = () => {
 		const {xs, ys, y1s} = this.getXYs()
-		const intervals = xs
-			.map((x, index, xs) => Math.abs(x - (xs[index - 1] || 0)))
-			.filter((interval) => interval)
 
 		const yMin = Math.max(Math.min(0, ...ys), -MAX_VALUE)
 		const yMax = Math.min(Math.max(0, ...ys), MAX_VALUE)
@@ -246,10 +244,16 @@ class LinearChart extends React.Component {
 		const yRatio = Math.min(-yMin, yMax) / Math.max(-yMin, yMax)
 		const y1Ratio = Math.min(-y1Min, y1Max) / Math.max(-y1Min, y1Max)
 
-		const xDomain = [
-			Math.min(...xs) - Math.min(...intervals) / 2,
-			Math.max(...xs) + Math.min(...intervals) / 2,
-		]
+		let xDomain = [Math.min(...xs), Math.max(...xs)]
+		if (this.getChildren("Bar").length) {
+			const intervals = xs
+				.map((x, index, xs) => Math.abs(x - (xs[index - 1] || 0)))
+				.filter((interval) => interval)
+			xDomain = [
+				Math.min(...xs) - Math.min(...intervals) / 2,
+				Math.max(...xs) + Math.min(...intervals) / 2,
+			]
+		}
 
 		switch (true) {
 			case (!y1s || !y1s.length || (!y1Min && !y1Max)):
@@ -281,7 +285,7 @@ class LinearChart extends React.Component {
 		}
 	}
 	getXYs = () => {
-		const chartProps = this.getChildren(["Bar", "Line"])
+		const chartProps = this.getChildren(CHART_TYPES)
 			.map(({props}) => (props || {}))
 		const points = chartProps
 			.reduce((points, props) => points.concat(props.points), [])
