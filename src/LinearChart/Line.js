@@ -67,7 +67,7 @@ class Line extends React.Component {
 			.filter(({x, y}, index) => {
 				const {y: prevY} = (this.props.points[index - 1] || {})
 				const {y: nextY} = (this.props.points[index + 1] || {})
-				return Number.isFinite(y) && !(Number.isFinite(prevY) && Number.isFinite(nextY))
+				return Number.isFinite(y) && !(Number.isFinite(prevY) || Number.isFinite(nextY))
 			})
 			.map(({x, y}, index) => (
 				<circle key={index}

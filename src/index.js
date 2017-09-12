@@ -35,9 +35,9 @@ function render() {
 				<Bar points={generatePoints(20)} />
 				<Bar points={generatePoints(30)} />
 				<Area axis="percent"
-					points={[...new Array(2500)].map((undef, index) => ({x: index, y: index}))}
+					points={[...new Array(40)].map((undef, index) => ({x: index, y: index}))}
 				/>
-				<Line axis="percent" points={generatePoints(5000, -1)} />
+				<Line axis="percent" points={generatePoints(50, -1)} />
 				<Sensor>
 					<Focus />
 					<Tooltip />
@@ -55,8 +55,8 @@ function generatePoints(length, sign = 1) {
 				x: index - length / 2,
 				y: (0.1 < Math.random())
 					? Math.sign(sign) * length * Math.random()
-					// : null
-					: Math.sign(sign) * Infinity,
+					: null
+					// : Math.sign(sign) * Infinity,
 			}
 			: null
 		)
