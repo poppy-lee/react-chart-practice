@@ -28,7 +28,12 @@ class Sensor extends React.Component {
 	state = initialState
 
 	findPoint = (mouseX) => {
-		const point = findClosestPoint(this.props.points, +this.props.xScale.invert(mouseX))
+		const point = findClosestPoint(
+			this.props.points
+				.map(({x, ys}) => ({x, ys: ys.filter(({y}) => y !== null)}))
+				.filter(({ys}) => ys.length),
+			+this.props.xScale.invert(mouseX)
+		)
 		return point && Number.isFinite(point.x) ? point : {}
 	}
 
