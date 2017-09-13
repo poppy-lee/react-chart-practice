@@ -29,7 +29,7 @@ function render() {
 				]}
 			>
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
-				<YAxis name="dollars" tickValues={[-50, 0, 50]} tickPrefix="$" />
+				<YAxis name="dollars" tickPrefix="$" />
 				<YAxis name="percent" tickPostfix="%" />
 				<Bar points={generatePoints(10)} />
 				<Bar points={generatePoints(10)} />

@@ -100,7 +100,6 @@ class Area extends React.Component {
 		const {xScale, yScale} = this.getScales()
 		return (
 			d3.area()
-				.defined((point) => point && Number.isFinite(point.y))
 				.x(({x}) => xScale(x))
 				.y0(({y0}) => yScale(y0 || 0))
 				.y1(({y}) => yScale(y))
@@ -111,7 +110,6 @@ class Area extends React.Component {
 		const {xScale, yScale} = this.getScales()
 		return (
 			d3.line()
-				.defined((point) => point && Number.isFinite(point.y))
 				.x(({x}) => xScale(x))
 				.y1(({y}) => yScale(y))
 		) (points)
