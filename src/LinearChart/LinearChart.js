@@ -29,7 +29,7 @@ class LinearChart extends React.Component {
 		colors: d3.schemeCategory10,
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		enableNodeListForEach()
 	}
 
@@ -69,7 +69,7 @@ class LinearChart extends React.Component {
 			))
 	}
 	renderCharts = (props = {}) => {
-		const chartProps = this.getChartProps(true)
+		const chartProps = this.getChartProps()
 		return this.getChildren(CHART_TYPES)
 			.map((child, index) => (
 				<child.type key={`chart-${index}`} {...{
@@ -155,17 +155,22 @@ class LinearChart extends React.Component {
 		const xs = [...new Set(
 			chartProps
 			.reduce((xs, {points}) => [
-				...xs, ...points.filter((point) => point && Number.isFinite(point.x)).map(({x}) => x)
+				...xs,
+				...points
+					.filter((point) => point && Number.isFinite(point.x))
+					.map(({x}) => x)
 			], [])
 			.sort((xA, xB) => xA - xB)
 		)]
 		return xs.map((x) => ({
 			x,
 			ys: chartProps
-				.reduce((ys, {name, color, axis, axisIndex, axisCount, points = []}) => {
+				.reduce((ys, chartProp = {}) => {
+					const {points = []} = chartProp
 					const point = findPoint(points, x)
-					if (point && Number.isFinite(point.x))
-						ys.push({name, color, axis, axisIndex, axisCount, ...point})
+					if (point && Number.isFinite(point.x)) {
+						ys.push({...chartProp, ...point})
+					}
 					return ys
 				}, [])
 		}))
