@@ -31,13 +31,13 @@ function render() {
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
 				<YAxis name="dollars" tickValues={[-50, 0, 50]} tickPrefix="$" />
 				<YAxis name="percent" tickPostfix="%" />
-				<Bar points={generatePoints(10, -1)} />
-				<Bar points={generatePoints(20)} />
-				<Bar points={generatePoints(30)} />
-				<Area axis="percent"
-					points={[...new Array(40)].map((undef, index) => ({x: index, y: index}))}
+				<Bar points={generatePoints(10)} />
+				<Bar points={generatePoints(10)} />
+				<Line points={generatePoints(20)} />
+				<Line axis="percent"
+					points={[...new Array(20)].map((undef, index) => ({x: index, y: index}))}
 				/>
-				<Line axis="percent" points={generatePoints(50, -1)} />
+				<Area axis="percent" points={generatePoints(20, -1)} />
 				<Sensor>
 					<Focus />
 					<Tooltip />
