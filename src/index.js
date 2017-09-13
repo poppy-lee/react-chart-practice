@@ -33,7 +33,7 @@ function render() {
 				<YAxis name="percent" tickPostfix="%" />
 				<Bar points={generatePoints(10)} />
 				<Bar points={generatePoints(10)} />
-				<Line points={generatePoints(20)} />
+				<Line background points={generatePoints(20)} />
 				<Line axis="percent"
 					points={[...new Array(20)].map((undef, index) => ({x: index, y: index}))}
 				/>
