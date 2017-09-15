@@ -14,8 +14,8 @@ class YAxis extends React.Component {
 		yScale: PropTypes.func,
 		y1Scale: PropTypes.func,
 
-		typeIndex: PropTypes.number,
-		typeCount: PropTypes.number,
+		axisIndex: PropTypes.number,
+		axisCount: PropTypes.number,
 		ticks: PropTypes.number,
 		tickValues: PropTypes.array,
 		tickPrefix: PropTypes.string,
@@ -23,8 +23,8 @@ class YAxis extends React.Component {
 	}
 
 	getScales = () => {
-		const {typeIndex, xScale, yScale, y1Scale} = this.props
-		switch (typeIndex) {
+		const {axisIndex, xScale, yScale, y1Scale} = this.props
+		switch (axisIndex) {
 			case 0: return {xScale, yScale}
 			case 1: return {xScale, yScale: y1Scale}
 		}
@@ -45,16 +45,16 @@ class YAxis extends React.Component {
 	renderTick = (y) => {
 		const {
 			width, height, padding,
-			typeIndex, typeCount, tickPrefix, tickPostfix,
+			axisIndex, axisCount, tickPrefix, tickPostfix,
 		} = this.props
 
 		const {xScale, yScale} = this.getScales()
-		const x1 = typeCount <= 1
+		const x1 = axisCount <= 1
 			? padding.left
-			: (!typeIndex ? padding.left : width - padding.right - 5)
-		const x2 = typeCount <= 1
+			: (!axisIndex ? padding.left : width - padding.right - 5)
+		const x2 = axisCount <= 1
 			? width - padding.right
-			: (!typeIndex ? padding.left + 5 : width - padding.right)
+			: (!axisIndex ? padding.left + 5 : width - padding.right)
 
 		return (
 			<g key={y}
@@ -63,8 +63,8 @@ class YAxis extends React.Component {
 			>
 				<line stroke="#bbbbbb" x1={x1} y1="0" x2={x2} y2="0" />
 				<text
-					x={!typeIndex ? padding.left - 5 : width - padding.right + 5} y="3"
-					textAnchor={!typeIndex ? "end" : "start"}
+					x={!axisIndex ? padding.left - 5 : width - padding.right + 5} y="3"
+					textAnchor={!axisIndex ? "end" : "start"}
 				>
 					{y < 0 && "-"}{tickPrefix}{humanize(Math.abs(y))}{tickPostfix}
 				</text>

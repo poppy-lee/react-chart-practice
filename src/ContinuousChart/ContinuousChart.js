@@ -65,42 +65,21 @@ class ContinuousChart extends React.Component {
 		return this.getChildren("YAxis").slice(0, 2)
 			.map((child, index, yAxes) => (
 				<child.type key={`axis-y-${index}`} {...{
-					typeIndex: index, typeCount: yAxes.length,
+					axisIndex: index,
+					axisCount: yAxes.length,
 					...commonProps,
 					...(child.props || {}),
 				}} />
 			))
 	}
 	renderCharts = (commonProps = {}) => {
-		const {colors} = this.props
-		const yAxesProps = this.getChildren("YAxis").slice(0, 2)
-			.map(({props}) => props || {})
-			.map(({name: axis, ...yAxisProps}, axisIndex) => ({
-				axis, axisIndex,
-				yPrefix: yAxisProps.tickPrefix,
-				yPostfix: yAxisProps.tickPostfix,
-			}))
-		return this.getChildren(["Area", "Line"])
-			.map((child, index) => {
-				const chartProps = child.props || {}
-				const yAxisProps = yAxesProps.find(({axis}) => !chartProps.axis || chartProps.axis === axis) || {}
-				return (
-					<child.type key={`chart-${index}`} {...{
-						name: `y${index + 1}`,
-						color: colors[index % colors.length],
-						...commonProps, ...yAxisProps, ...chartProps,
-						points: (chartProps.points || [])
-							.filter((point) => point instanceof Object)
-							.filter(({x, y}) => Number.isFinite(x))
-							.map(({x, y}) => ({x, y: (Math.abs(y) < MAX_VALUE ? y : Math.sign(y) * Infinity)}))
-							.sort(({x: xA}, {x: xB}) => {
-								if (xA > xB) return 1
-								if (xA < xB) return -1
-								return 0
-							}),
-					}} />
-				)
-			})
+		return this.getChartProps()
+			.map(({Component, ...chartProps}, index) => (
+				<Component key={`chart${index}`} {...{
+					...commonProps,
+					...chartProps,
+				}} />
+			))
 	}
 	renderSensor = (commonProps = {}) => {
 		const [xFormat] = this.getChildren("XAxis")
@@ -123,43 +102,47 @@ class ContinuousChart extends React.Component {
 			.filter(({type = () => null}) => !types.length || types.includes(type.name))
 	}
 
-	getSensorPoints = () => {
-		const {colors} = this.props
-
-		const {xs} = this.getXYs()
-		const chartProps = this.getChildren(["Area", "Line"])
-			.map(({props}) => props || {})
-			.map(({points, ...props}) => ({
-				...props,
-				points: (points || [])
-					.filter((point) => point instanceof Object)
-					.filter(({x, y}) => Number.isFinite(x))
-					.map(({x, y}) => ({x, y: (Math.abs(y) < MAX_VALUE ? y : Math.sign(y) * Infinity)}))
-					.sort(({x: xA}, {x: xB}) => {
-						if (xA > xB) return 1
-						if (xA < xB) return -1
-						return 0
-					}),
-			}))
+	getYAxisProps = (axisName) => {
 		const yAxesProps = this.getChildren("YAxis").slice(0, 2)
 			.map(({props}) => props || {})
-			.map(({name: axis, ...yAxisProps}, axisIndex) => ({
+			.map(({name: axis, ...yAxisProps}, axisIndex, axes) => ({
 				axis, axisIndex,
 				yPrefix: yAxisProps.tickPrefix,
 				yPostfix: yAxisProps.tickPostfix,
 			}))
+		return yAxesProps.find(({axis}) => (!axisName || axis === axisName))
+	}
 
+	getChartProps = () => {
+		const {colors} = this.props
+		return this.getChildren(["Area", "Line"])
+			.map((child, index) => {
+				const {type, props} = child
+				const {axis, points, ...otherProps} = (props || {})
+				return {
+					Component: type,
+					name: `y${index + 1}`,
+					color: colors[index % colors.length],
+					points: (points || [])
+						.filter((point) => point instanceof Object)
+						.filter(({x, y}) => Number.isFinite(x))
+						.map(({x, y}) => ({x, y: (Math.abs(y) < MAX_VALUE ? y : Math.sign(y) * Infinity)}))
+						.sort(({x: xA}, {x: xB}) => xA - xB),
+					...this.getYAxisProps(axis),
+					...otherProps,
+				}
+			})
+	}
+
+	getSensorPoints = () => {
+		const {xs} = this.getXYs()
+		const chartProps = this.getChartProps()
 		return xs.map((x) => ({
 			x,
 			ys: chartProps
 				.reduce((ys, {points, ...chartProps}, index) => {
-					const yAxisProps = yAxesProps.find(({axis}) => !chartProps.axis || chartProps.axis === axis) || {}
 					const point = findPoint(points, x) || {}
-					return [...ys, {
-						name: `y${index + 1}`, color: colors[index % colors.length],
-						...yAxisProps, ...chartProps, ...point,
-					}]
-						.filter(({x}) => Number.isFinite(x))
+					return [...ys, {...chartProps, ...point}].filter(({x}) => Number.isFinite(x))
 				}, [])
 		}))
 	}
@@ -218,7 +201,11 @@ class ContinuousChart extends React.Component {
 		const xDomain = [Math.min(...xs), Math.max(...xs)]
 		switch (true) {
 			case (!y1s || !y1s.length || (!y1Min && !y1Max)):
-				return {xDomain, yDomain: [yMin, yMax], y1Domain: [0, 0]}
+				return {
+					xDomain,
+					yDomain: [yMin, yMax],
+					y1Domain: [0, 0]
+				}
 			case (-yMin < yMax && -y1Min >= y1Max):
 			case (-yMin >= yMax && -y1Min < y1Max):
 				return {
@@ -230,62 +217,47 @@ class ContinuousChart extends React.Component {
 			case (-yMin >= yMax && -y1Min >= y1Max):
 				return {
 					xDomain,
-					yDomain: (yRatio >= y1Ratio)
-						? [yMin, yMax]
+					yDomain: (yRatio >= y1Ratio) ? [yMin, yMax]
 						: [
 							-(-y1Min < y1Max ? y1Ratio : 1) * Math.max(-yMin, yMax),
 							(-y1Min >= y1Max ? y1Ratio : 1) * Math.max(-yMin, yMax),
 						],
-					y1Domain: (yRatio >= y1Ratio)
-						? [
+					y1Domain: (yRatio < y1Ratio) ? [y1Min, y1Max]
+						: [
 							-(-yMin < yMax ? yRatio : 1) * Math.max(-y1Min, y1Max),
 							(-yMin >= yMax ? yRatio : 1) * Math.max(-y1Min, y1Max),
 						]
-						: [y1Min, y1Max],
 				}
 		}
 	}
 	getXYs = () => {
-		const chartProps = this.getChildren(["Area", "Line"])
-			.map(({props}) => (props || {}))
-		const points = chartProps
-			.reduce((points, props) => points.concat(props.points), [])
-			.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
+		const chartProps = this.getChartProps()
+		const points = chartProps.reduce((points, props) => points.concat(props.points), [])
 
 		const xAxes = this.getChildren("XAxis").slice(0, 1)
 		const yAxes = this.getChildren("YAxis").slice(0, 2)
-		const [xs] = (xAxes.length)
-			? xAxes.reduce((xsArray, {props: axisProps = {}}, index) => {
-				xsArray[index] = chartProps
-					.reduce((xs, props) => [
-						...xs, ...(axisProps.tickValues || []),
-						...(props.points || [])
-							.filter((point) => point && Number.isFinite(point.x))
-							.map(({x, y}) => x),
-					], [])
-				return xsArray
-			}, [])
-			: [points.map(({x}) => x)]
-		const [ys, y1s] = (yAxes.length === 2)
-			? yAxes.reduce((ysArray, {props: axisProps = {}}, index) => {
-				ysArray[index] = chartProps
+
+		const [xs] = !xAxes.length ? [points.map(({x}) => x), []]
+			: xAxes.reduce((xsArray, {props: axisProps = {}}, index) => [
+				...xsArray,
+				chartProps.reduce((xs, {points}) => [
+					...xs, ...points.map(({x, y}) => x),
+					...(axisProps.tickValues || []),
+				], [])
+			], [])
+		const [ys, y1s] = (yAxes.length !== 2) ? [points.map(({y}) => y), []]
+			: yAxes.reduce((ysArray, {props: axisProps = {}}, index) => [
+				...ysArray,
+				chartProps
 					.filter(({axis}) => (!index && !axis) || (axisProps.name === axis))
-					.reduce((ys, props) => [
-						...ys, ...(axisProps.tickValues || []),
-						...(props.points || [])
-							.filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y))
-							.map(({x, y}) => y),
+					.reduce((ys, {points}) => [
+						...ys,
+						...points.map(({x, y}) => y),
+						...(axisProps.tickValues || []),
 					], [])
-				return ysArray
-			}, [])
-			: [points.map(({y}) => y), []]
+			], [])
 
-		const sort = (a, b) => {
-			if (a > b) return 1
-			if (a < b) return -1
-			return 0
-		}
-
+		const sort = (a, b) => (a - b)
 		return {
 			xs: [...new Set(xs)].sort(sort),
 			ys: [...new Set(ys)].sort(sort),
