@@ -21,18 +21,26 @@ class Focus extends React.Component {
 				color: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-				axix: PropTypes.string,
 				axisIndex: PropTypes.number,
-				axisCount: PropTypes.number,
 			})
 		),
 	}
 
+	getScales = () => {
+		const {axisIndex, xScale, yScale, y1Scale} = this.props
+		switch (axisIndex) {
+			case 0: return {xScale, yScale}
+			case 1: return {xScale, yScale: y1Scale}
+		}
+		return {xScale, yScale}
+	}
+
 	render() {
 		const {
-			width, height, padding, xScale, yScale, y1Scale,
+			width, height, padding,
 			sticky, mouseX, mouseY, x, ys
 		} = this.props
+		const {xScale, yScale} = this.getScales()
 
 		return (
 			<g className="focus">
@@ -51,13 +59,11 @@ class Focus extends React.Component {
 							axisIndex, type, typeCount, typeIndex, bandWidth,
 							color, x: pointX, y: pointY,
 						} = point
-						const cx = xScale(pointX || x)
-						const barX = (type === "Bar") ? (bandWidth / typeCount) * (typeIndex + 0.5) - bandWidth / 2 : 0
 						return (
 							<circle key={index}
 								r="4"
-								cx={cx + barX}
-								cy={!axisIndex ? yScale(pointY) : y1Scale(pointY)}
+								cx={xScale(pointX || x)}
+								cy={yScale(pointY)}
 								stroke="#ffffff"
 								fill={color}
 							/>

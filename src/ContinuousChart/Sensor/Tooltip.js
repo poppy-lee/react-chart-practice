@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
 import React from "react"
 
-import format from "../lib/format"
+import format from "../../lib/format"
 
 export default
 class Tooltip extends React.Component {
@@ -19,6 +19,7 @@ class Tooltip extends React.Component {
 		ys: PropTypes.arrayOf(
 			PropTypes.shape({
 				color: PropTypes.string,
+				name: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				yPrefix: PropTypes.string,

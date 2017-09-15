@@ -1,21 +1,20 @@
-import LinearChart from "./LinearChart"
+import ContinuousChart from "./ContinuousChart"
 
 import XAxis from "./XAxis"
 import YAxis from "./YAxis"
 
 import Area from "./Area"
-import Bar from "./Bar"
 import Line from "./Line"
 
 import Sensor from "./Sensor"
 import Focus from "./Sensor/Focus"
 import Tooltip from "./Sensor/Tooltip"
 
-export default LinearChart
+export default ContinuousChart
 export {
-	LinearChart,
+	ContinuousChart,
 		XAxis, YAxis,
-		Area, Bar, Line,
+		Area, Line,
 		Sensor,
 			Focus, Tooltip
 }

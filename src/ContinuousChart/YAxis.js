@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
 import React from "react"
 
-import humanize from "./lib/humanize"
+import humanize from "../lib/humanize"
 
 export default
 class YAxis extends React.Component {

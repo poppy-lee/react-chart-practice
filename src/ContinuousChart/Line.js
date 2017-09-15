@@ -24,10 +24,6 @@ class Line extends React.Component {
 
 		axix: PropTypes.string,
 		axisIndex: PropTypes.number,
-		axisCount: PropTypes.number,
-		type: PropTypes.string,
-		typeIndex: PropTypes.number,
-		typeCount: PropTypes.number,
 	}
 
 	static defaultProps = {
@@ -91,7 +87,7 @@ class Line extends React.Component {
 	}
 
 	renderCircles = () => {
-		const {color, lineWidth, axisIndex} = this.props
+		const {color, lineWidth} = this.props
 		const {xScale, yScale} = this.getScales()
 
 		return this.props.points

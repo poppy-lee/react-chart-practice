@@ -28,10 +28,6 @@ class Area extends React.Component {
 
 		axix: PropTypes.string,
 		axisIndex: PropTypes.number,
-		axisCount: PropTypes.number,
-		type: PropTypes.string,
-		typeIndex: PropTypes.number,
-		typeCount: PropTypes.number,
 	}
 
 	static defaultProps = {
@@ -70,28 +66,25 @@ class Area extends React.Component {
 						d={this.getLineDescription()}
 					/>
 				)}
-				{line && this.renderCircles()}
+				{this.renderCircles()}
 			</g>
 		)
 	}
 
 	renderCircles = () => {
-		const {
-			color, lineColor, lineOpacity, lineWidth,
-			axisIndex
-		} = this.props
+		const {color, lineWidth} = this.props
 		const {xScale, yScale} = this.getScales()
 
 		return this.props.points
 			.filter(({x, y}, index) => {
 				const {y: prevY} = (this.props.points[index - 1] || {})
 				const {y: nextY} = (this.props.points[index + 1] || {})
-				return Number.isFinite(y) && !(Number.isFinite(prevY) && Number.isFinite(nextY))
+				return Number.isFinite(y) && !(Number.isFinite(prevY) || Number.isFinite(nextY))
 			})
 			.map(({x, y}, index) => (
 				<circle key={index}
 					r={lineWidth} cx={xScale(x)} cy={yScale(y)}
-					stroke="none" fill={lineColor || color} opacity={lineOpacity}
+					stroke="none" fill={color}
 				/>
 			))
 	}
@@ -100,6 +93,7 @@ class Area extends React.Component {
 		const {xScale, yScale} = this.getScales()
 		return (
 			d3.area()
+				.defined((point) => point && Number.isFinite(point.y))
 				.x(({x}) => xScale(x))
 				.y0(({y0}) => yScale(y0 || 0))
 				.y1(({y}) => yScale(y))
@@ -110,6 +104,7 @@ class Area extends React.Component {
 		const {xScale, yScale} = this.getScales()
 		return (
 			d3.line()
+				.defined((point) => point && Number.isFinite(point.y))
 				.x(({x}) => xScale(x))
 				.y1(({y}) => yScale(y))
 		) (points)

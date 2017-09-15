@@ -2,12 +2,12 @@ import React from "react"
 import ReactDOM from "react-dom"
 
 import {
-	LinearChart,
+	ContinuousChart,
 		XAxis, YAxis,
-		Area, Bar, Line,
+		Area, Line,
 		Sensor,
 			Focus, Tooltip
-} from "./LinearChart"
+} from "./ContinuousChart"
 
 window.onresize = (() => render())
 render()
@@ -21,7 +21,7 @@ function render() {
 
 	ReactDOM.render(
 		<div style={{fontSize: 0}}>
-			<LinearChart
+			<ContinuousChart
 				width={width} height={height} padding={padding}
 				colors={[
 					"#3baeda", "#8cc054", "#f6bb43", "#f66043", "#8679c5",
@@ -29,12 +29,10 @@ function render() {
 				]}
 			>
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
-				<YAxis name="dollars" tickPrefix="$" />
+				<YAxis name="dollars" tickValues={[-50, 0, 50]} tickPrefix="$" />
 				<YAxis name="percent" tickPostfix="%" />
-				<Bar points={generatePoints(10)} />
-				<Bar points={generatePoints(10)} />
 				<Line background points={generatePoints(20)} />
-				<Line axis="percent"
+				<Line axis="dollars"
 					points={[...new Array(20)].map((undef, index) => ({x: index, y: index}))}
 				/>
 				<Area axis="percent" points={generatePoints(20, -1)} />
@@ -42,7 +40,7 @@ function render() {
 					<Focus />
 					<Tooltip />
 				</Sensor>
-			</LinearChart>
+			</ContinuousChart>
 		</div>,
 		document.querySelector("#app")
 	)
