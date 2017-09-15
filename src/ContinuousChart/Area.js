@@ -34,8 +34,8 @@ class Area extends React.Component {
 		lineWidth: 2.5,
 	}
 
-	getScales = () => {
-		const {axisIndex, xScale, yScale, y1Scale} = this.props
+	getScales = (axisIndex = this.props.axisIndex) => {
+		const {xScale, yScale, y1Scale} = this.props
 		switch (axisIndex) {
 			case 0: return {xScale, yScale}
 			case 1: return {xScale, yScale: y1Scale}

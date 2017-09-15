@@ -26,8 +26,8 @@ class Focus extends React.Component {
 		),
 	}
 
-	getScales = () => {
-		const {axisIndex, xScale, yScale, y1Scale} = this.props
+	getScales = (axisIndex) => {
+		const {xScale, yScale, y1Scale} = this.props
 		switch (axisIndex) {
 			case 0: return {xScale, yScale}
 			case 1: return {xScale, yScale: y1Scale}
@@ -37,10 +37,9 @@ class Focus extends React.Component {
 
 	render() {
 		const {
-			width, height, padding,
+			width, height, padding, xScale,
 			sticky, mouseX, mouseY, x, ys
 		} = this.props
-		const {xScale, yScale} = this.getScales()
 
 		return (
 			<g className="focus">
@@ -55,10 +54,8 @@ class Focus extends React.Component {
 				{ys
 					.filter(({y}) => Number.isFinite(y))
 					.map((point, index) => {
-						const {
-							axisIndex, type, typeCount, typeIndex, bandWidth,
-							color, x: pointX, y: pointY,
-						} = point
+						const {color, axisIndex, x: pointX, y: pointY} = point
+						const {xScale, yScale} = this.getScales(axisIndex)
 						return (
 							<circle key={index}
 								r="4"
