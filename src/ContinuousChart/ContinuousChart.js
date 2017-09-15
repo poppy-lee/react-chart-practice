@@ -82,15 +82,12 @@ class ContinuousChart extends React.Component {
 			))
 	}
 	renderSensor = (commonProps = {}) => {
-		const [xFormat] = this.getChildren("XAxis")
-			.map(({props = {}}) => props.tickFormat)
-		const points = this.getSensorPoints()
 		return this.getChildren("Sensor")
 			.map((child, index) => (
 				<child.type key={`sensor-${index}`} {...{
 					...commonProps,
 					...(child.props || {}),
-					xFormat, points,
+					points: this.getSensorPoints(),
 				}} />
 			))
 	}
@@ -103,19 +100,18 @@ class ContinuousChart extends React.Component {
 	}
 
 	getYAxisProps = (axisName) => {
-		const axesProps = this.getChildren("YAxis").slice(0, 2)
+		const yAxisProps = this.getChildren("YAxis").slice(0, 2)
 			.map(({props}) => props || {})
 			.map(({name: axis, ...yAxisProps}, axisIndex, axes) => ({
 				axis, axisIndex,
 				yPrefix: yAxisProps.tickPrefix,
 				yPostfix: yAxisProps.tickPostfix,
 			}))
-		const useFirstYAxis = !(axisName && axesProps.some((({axis}) => axis === axisName)))
-		return axesProps.find(({axis}) => (useFirstYAxis || axis === axisName))
+		const useFirstYAxis = !(axisName && yAxisProps.some((({axis}) => axis === axisName)))
+		return yAxisProps.find(({axis}) => (useFirstYAxis || axis === axisName))
 	}
 
 	getChartProps = () => {
-		const {colors} = this.props
 		return this.getChildren(["Area", "Line"])
 			.map((child, index) => {
 				const {type, props} = child
@@ -123,7 +119,7 @@ class ContinuousChart extends React.Component {
 				return {
 					Component: type,
 					name: `y${index + 1}`,
-					color: colors[index % colors.length],
+					color: this.props.colors[index % this.props.colors.length],
 					points: (points || [])
 						.filter((point) => point instanceof Object)
 						.filter(({x, y}) => Number.isFinite(x))
@@ -136,16 +132,18 @@ class ContinuousChart extends React.Component {
 	}
 
 	getSensorPoints = () => {
-		const {xs} = this.getXYs()
 		const chartProps = this.getChartProps()
-		return xs.map((x) => ({
-			x,
-			ys: chartProps
-				.reduce((ys, {points, ...chartProps}, index) => {
-					const point = findPoint(points, x) || {}
-					return [...ys, {...chartProps, ...point}].filter(({x}) => Number.isFinite(x))
-				}, [])
-		}))
+		const points = chartProps.reduce((points, props) => points.concat(props.points || []), [])
+		return [...new Set(points.map(({x}) => x))]
+			.sort((a, b) => (a - b))
+			.map((x) => ({
+				x,
+				ys: chartProps
+					.reduce((ys, {points, ...chartProps}, index) => {
+						const point = findPoint(points, x) || {}
+						return [...ys, {...chartProps, ...point}].filter(({x}) => Number.isFinite(x))
+					}, [])
+			}))
 	}
 
 	getPadding = () => {
@@ -238,7 +236,7 @@ class ContinuousChart extends React.Component {
 		const xAxes = this.getChildren("XAxis").slice(0, 1)
 		const yAxes = this.getChildren("YAxis").slice(0, 2)
 
-		const [xs] = !xAxes.length ? [points.map(({x}) => x), []]
+		const [xs] = !xAxes.length ? [points.map(({x}) => x)]
 			: xAxes.reduce((xsArray, {props: axisProps = {}}, index) => [
 				...xsArray,
 				chartProps.reduce((xs, {points}) => [
@@ -246,7 +244,7 @@ class ContinuousChart extends React.Component {
 					...(axisProps.tickValues || []),
 				], [])
 			], [])
-		const [ys, y1s] = (yAxes.length !== 2) ? [points.map(({y}) => y), []]
+		const [ys, y1s] = !yAxes.length ? [points.map(({y}) => y), []]
 			: yAxes.reduce((ysArray, {props: axisProps = {}}, index) => [
 				...ysArray,
 				chartProps
@@ -258,11 +256,10 @@ class ContinuousChart extends React.Component {
 					], [])
 			], [])
 
-		const sort = (a, b) => (a - b)
 		return {
-			xs: [...new Set(xs)].sort(sort),
-			ys: [...new Set(ys)].sort(sort),
-			y1s: [...new Set(y1s)].sort(sort),
+			xs: [...new Set(xs)].sort((a, b) => (a - b)),
+			ys: [...new Set(ys)].sort((a, b) => (a - b)),
+			y1s: [...new Set(y1s)].sort((a, b) => (a - b)),
 		}
 	}
 
