@@ -103,14 +103,15 @@ class ContinuousChart extends React.Component {
 	}
 
 	getYAxisProps = (axisName) => {
-		const yAxesProps = this.getChildren("YAxis").slice(0, 2)
+		const axesProps = this.getChildren("YAxis").slice(0, 2)
 			.map(({props}) => props || {})
 			.map(({name: axis, ...yAxisProps}, axisIndex, axes) => ({
 				axis, axisIndex,
 				yPrefix: yAxisProps.tickPrefix,
 				yPostfix: yAxisProps.tickPostfix,
 			}))
-		return yAxesProps.find(({axis}) => (!axisName || axis === axisName))
+		const useFirstYAxis = !(axisName && axesProps.some((({axis}) => axis === axisName)))
+		return axesProps.find(({axis}) => (useFirstYAxis || axis === axisName))
 	}
 
 	getChartProps = () => {
