@@ -121,7 +121,7 @@ class Line extends React.Component {
 			d3.area()
 				.defined((point) => point && Number.isFinite(point.y1))
 				.x(({x}) => xScale(x))
-				.y0(({y0}) => yScale(y0 || 0))
+				.y0(({y0}) => yScale(y0))
 				.y1(({y1}) => yScale(y1))
 		) (points)
 	}

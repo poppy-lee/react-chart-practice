@@ -39,12 +39,25 @@ function render() {
 				/>
 				<Area line axis="dollars" group="dollars-area" name="dollars1"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
+					points={generatePoints(20)}
 				/>
 				<Area line axis="dollars" group="dollars-area" name="dollars2"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
+					points={generatePoints(20)}
 				/>
 				<Area line axis="dollars" group="dollars-area" name="dollars3"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
+					points={generatePoints(20)}
+				/>
+
+				<Area line axis="percent" group="percent-area" name="percent"
+					points={[...new Array(21)].map((undef, index) => ({x: index, y: -index / 3}))}
+				/>
+				<Area line axis="percent" group="percent-area" name="percent"
+					points={[...new Array(21)].map((undef, index) => ({x: index, y: -index / 3}))}
+				/>
+				<Area line axis="percent" group="percent-area" name="percent"
+					points={[...new Array(21)].map((undef, index) => ({x: index, y: -index / 3}))}
 				/>
 
 				<Sensor>
@@ -59,10 +72,13 @@ function render() {
 
 function generatePoints(length, sign = 1) {
 	return [...new Array(Math.abs(length) + 1)]
-		.map((undef, index) => (0.1 < Math.random())
+		.map((undef, index) => (
+			(0.1 < Math.random())
+			// (0.0 < Math.random())
 			? {
 				x: index - length / 2,
 				// x: Math.random() * length,
+				// y: Math.sign(sign) * length * Math.random(),
 				y: (0.1 < Math.random())
 					? Math.sign(sign) * length * Math.random()
 					: null
@@ -70,6 +86,7 @@ function generatePoints(length, sign = 1) {
 			}
 			: null
 		)
+	)
 }
 
 function parseMargin({margin, marginTop, marginRight, marginBottom, marginLeft}) {

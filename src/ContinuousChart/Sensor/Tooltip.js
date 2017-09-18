@@ -67,7 +67,7 @@ class Tooltip extends React.Component {
 	}
 
 	renderLine = ({color, name, x, y0, y1, yPrefix, yPostfix}, index) => {
-		const isNumber = Number.isFinite(y1 - (y0 || 0))
+		const isNumber = Number.isFinite(y1 - y0)
 		const contentX = this.padding
 		const contentY = this.padding + this.lineHeight * (index + 1)
 		return (
@@ -75,9 +75,9 @@ class Tooltip extends React.Component {
 				<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
 				<text className="name" x="13" y={this.textY}>{name}</text>
 				<text className="value" y={this.textY} textAnchor="end">
-					{(y1 - (y0 || 0)) < 0 && "-"}
+					{(y1 - y0) < 0 && "-"}
 					{isNumber && yPrefix}
-					{format(Math.abs(y1 - (y0 || 0)))}
+					{format(Math.abs(y1 - y0))}
 					{isNumber && yPostfix}
 				</text>
 			</g>
