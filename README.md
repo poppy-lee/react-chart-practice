@@ -40,7 +40,7 @@ import {
 		<Tooltip />
 	</Sensor>
 
-	<Line background points={[{x: 0, y: 10}, {x: 20, y: 20}]} />
+	<Line background points={[{x: 0, y: 10}, {x: 5, y: 20}]} />
 	<Area line axis="dollars" group="dollars-area" name="dollars1"
 		points={[
 			{"x":-3,"y":1.4509163888776357},
@@ -64,7 +64,6 @@ import {
 		]}
 	/>
 	<Area line axis="dollars" group="dollars-area" name="dollars3"
-		points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
 		points={[
 			{"x":-3,"y":null},
 			{"x":-2,"y":1.0229734906761419},
