@@ -168,10 +168,10 @@ class ContinuousChart extends React.Component {
 		const padding = this.getPadding()
 		const {xDomain, yDomain, y1Domain} = this.getDomains()
 
-		const {xs} = this.getXYs()
+		const {xAxisValues} = this.getValuesByAxis()
 		const dayInterval = 1000 * 60 * 60 * 24
-		const intervals = xs
-			.map((x, index, xs) => Math.abs(x - (xs[index - 1] || 0)))
+		const intervals = xAxisValues
+			.map((x, index, xAxisValues) => Math.abs(x - (xAxisValues[index - 1] || 0)))
 			.filter((interval) => interval)
 
 		return {
@@ -186,80 +186,83 @@ class ContinuousChart extends React.Component {
 				.range([height - padding.bottom, padding.top]),
 		}
 	}
+
 	getDomains = () => {
-		const {xs, ys, y1s} = this.getXYs()
+		const {xAxisValues, yAxis0Values, yAxis1Values} = this.getValuesByAxis()
 
-		const yMin = Math.max(Math.min(0, ...ys), -MAX_VALUE)
-		const yMax = Math.min(Math.max(0, ...ys), MAX_VALUE)
-		const y1Min = Math.max(Math.min(0, ...y1s), -MAX_VALUE)
-		const y1Max = Math.min(Math.max(0, ...y1s), MAX_VALUE)
+		const yAxis0Min = Math.max(Math.min(0, ...yAxis0Values), -MAX_VALUE)
+		const yAxis0Max = Math.min(Math.max(0, ...yAxis0Values), MAX_VALUE)
+		const yAxis1Min = Math.max(Math.min(0, ...yAxis1Values), -MAX_VALUE)
+		const yAxis1Max = Math.min(Math.max(0, ...yAxis1Values), MAX_VALUE)
 
-		const yRatio = Math.min(-yMin, yMax) / Math.max(-yMin, yMax)
-		const y1Ratio = Math.min(-y1Min, y1Max) / Math.max(-y1Min, y1Max)
+		const yRatio = Math.min(-yAxis0Min, yAxis0Max) / Math.max(-yAxis0Min, yAxis0Max)
+		const y1Ratio = Math.min(-yAxis1Min, yAxis1Max) / Math.max(-yAxis1Min, yAxis1Max)
 
-		const xDomain = [Math.min(...xs), Math.max(...xs)]
+		const xDomain = [Math.min(...xAxisValues), Math.max(...xAxisValues)]
 		switch (true) {
-			case (!y1s || !y1s.length || (!y1Min && !y1Max)):
+			case (!yAxis1Values || !yAxis1Values.length || (!yAxis1Min && !yAxis1Max)):
 				return {
 					xDomain,
-					yDomain: [yMin, yMax],
+					yDomain: [yAxis0Min, yAxis0Max],
 					y1Domain: [0, 0]
 				}
-			case (-yMin < yMax && -y1Min >= y1Max):
-			case (-yMin >= yMax && -y1Min < y1Max):
+			case (-yAxis0Min < yAxis0Max && -yAxis1Min >= yAxis1Max):
+			case (-yAxis0Min >= yAxis0Max && -yAxis1Min < yAxis1Max):
 				return {
 					xDomain,
-					yDomain: [-Math.max(-yMin, yMax), Math.max(-yMin, yMax)],
-					y1Domain: [-Math.max(-y1Min, y1Max), Math.max(-y1Min, y1Max)],
+					yDomain: [-Math.max(-yAxis0Min, yAxis0Max), Math.max(-yAxis0Min, yAxis0Max)],
+					y1Domain: [-Math.max(-yAxis1Min, yAxis1Max), Math.max(-yAxis1Min, yAxis1Max)],
 				}
-			case (-yMin < yMax && -y1Min < y1Max):
-			case (-yMin >= yMax && -y1Min >= y1Max):
+			case (-yAxis0Min < yAxis0Max && -yAxis1Min < yAxis1Max):
+			case (-yAxis0Min >= yAxis0Max && -yAxis1Min >= yAxis1Max):
 				return {
 					xDomain,
-					yDomain: (yRatio >= y1Ratio) ? [yMin, yMax]
+					yDomain: (yRatio >= y1Ratio) ? [yAxis0Min, yAxis0Max]
 						: [
-							-(-y1Min < y1Max ? y1Ratio : 1) * Math.max(-yMin, yMax),
-							(-y1Min >= y1Max ? y1Ratio : 1) * Math.max(-yMin, yMax),
+							-(-yAxis1Min < yAxis1Max ? y1Ratio : 1) * Math.max(-yAxis0Min, yAxis0Max),
+							(-yAxis1Min >= yAxis1Max ? y1Ratio : 1) * Math.max(-yAxis0Min, yAxis0Max),
 						],
-					y1Domain: (yRatio < y1Ratio) ? [y1Min, y1Max]
+					y1Domain: (yRatio < y1Ratio) ? [yAxis1Min, yAxis1Max]
 						: [
-							-(-yMin < yMax ? yRatio : 1) * Math.max(-y1Min, y1Max),
-							(-yMin >= yMax ? yRatio : 1) * Math.max(-y1Min, y1Max),
+							-(-yAxis0Min < yAxis0Max ? yRatio : 1) * Math.max(-yAxis1Min, yAxis1Max),
+							(-yAxis0Min >= yAxis0Max ? yRatio : 1) * Math.max(-yAxis1Min, yAxis1Max),
 						]
 				}
 		}
 	}
-	getXYs = () => {
+
+	getValuesByAxis = () => {
 		const chartProps = this.getChartProps()
 		const points = chartProps.reduce((points, props) => points.concat(props.points), [])
 
 		const xAxes = this.getChildren("XAxis").slice(0, 1)
 		const yAxes = this.getChildren("YAxis").slice(0, 2)
 
-		const [xs] = !xAxes.length ? [points.map(({x}) => x)]
+		const [xAxisValues] = !xAxes.length ? [points.map(({x}) => x)]
 			: xAxes.reduce((xsArray, {props: axisProps = {}}, index) => [
 				...xsArray,
-				chartProps.reduce((xs, {points}) => [
-					...xs, ...points.map(({x, y}) => x),
+				chartProps.reduce((xAxisValues, {points}) => [
+					...xAxisValues,
+					...points.map(({x, y}) => x),
 					...(axisProps.tickValues || []),
 				], [])
 			], [])
-		const [ys, y1s] = !yAxes.length ? [points.map(({y}) => y), []]
+		const [yAxis0Values, yAxis1Values] = !yAxes.length ? [points.map(({y}) => y), []]
 			: yAxes.reduce((ysArray, {props: axisProps = {}}, index) => [
 				...ysArray,
 				chartProps
 					.filter(({axis}) => (!index && !axis) || (axisProps.name === axis))
-					.reduce((ys, {points}) => [
-						...ys,
+					.reduce((yAxis0Values, {points}) => [
+						...yAxis0Values,
 						...points.map(({x, y}) => y),
 						...(axisProps.tickValues || []),
 					], [])
 			], [])
 
 		return {
-			xs: [...new Set(xs)].sort((a, b) => (a - b)),
-			ys: [...new Set(ys)].sort((a, b) => (a - b)),
-			y1s: [...new Set(y1s)].sort((a, b) => (a - b)),
+			xAxisValues: [...new Set(xAxisValues)].sort((a, b) => (a - b)),
+			yAxis0Values: [...new Set(yAxis0Values)].sort((a, b) => (a - b)),
+			yAxis1Values: [...new Set(yAxis1Values)].sort((a, b) => (a - b)),
 		}
 	}
 
