@@ -50,13 +50,13 @@ function render() {
 					points={generatePoints(20)}
 				/>
 
-				<Area line axis="percent" group="percent-area" name="percent"
+				<Area line axis="percent" group name="percent1"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: -index / 3}))}
 				/>
-				<Area line axis="percent" group="percent-area" name="percent"
+				<Area line axis="percent" group name="percent2"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: -index / 3}))}
 				/>
-				<Area line axis="percent" group="percent-area" name="percent"
+				<Area line axis="percent" group name="percent3"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: -index / 3}))}
 				/>
 
