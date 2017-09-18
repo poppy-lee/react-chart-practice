@@ -20,7 +20,8 @@ class Focus extends React.Component {
 			PropTypes.shape({
 				color: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+				y0: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+				y1: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 				axisIndex: PropTypes.number,
 			})
 		),
@@ -52,15 +53,15 @@ class Focus extends React.Component {
 					/>
 				)}
 				{ys
-					.filter(({y}) => Number.isFinite(y))
+					.filter(({y1}) => Number.isFinite(y1))
 					.map((point, index) => {
-						const {color, axisIndex, x: pointX, y: pointY} = point
+						const {color, axisIndex, x, y0, y1} = point
 						const {xScale, yScale} = this.getScales(axisIndex)
 						return (
 							<circle key={index}
 								r="4"
-								cx={xScale(pointX || x)}
-								cy={yScale(pointY)}
+								cx={xScale(x) || xScale(this.props.x)}
+								cy={yScale(y1)}
 								stroke="#ffffff"
 								fill={color}
 							/>

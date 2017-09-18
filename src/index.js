@@ -30,12 +30,25 @@ function render() {
 			>
 				<XAxis ticks={10} tickFormat={(x) => `x=${x}`} />
 				<YAxis name="percent" tickPostfix="%" />
-				<YAxis name="dollars" tickValues={[-50, 0, 50]} tickPrefix="$" />
-				<Line background points={generatePoints(20)} />
-				<Line name="dollars" axis="dollars"
-					points={[...new Array(21)].map((undef, index) => ({x: index, y: index}))}
+				<YAxis name="dollars" tickPrefix="$" />
+				{/* <YAxis name="dollars" tickValues={[-50, 0, 50]} tickPrefix="$" /> */}
+
+				<Line name="default" points={generatePoints(20)} />
+				<Line background axis="dollars" name="dollars"
+					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 2}))}
 				/>
-				<Area name="percent" axis="percent" points={generatePoints(20, -1)} />
+				<Area line axis="dollars" group="dollars-area" name="dollars1"
+					points={[...new Array(21)].map((undef, index) => ({x: index, y0: index / 2, y1: index}))}
+				/>
+				<Area line axis="dollars" group="dollars-area" name="dollars2"
+					// points={[...new Array(21)].map((undef, index) => ({x: index, y: index}))}
+					points={generatePoints(20, -1)}
+				/>
+				<Area line axis="dollars" group="dollars-area" name="dollars3"
+					// points={[...new Array(21)].map((undef, index) => ({x: index, y: index}))}
+					points={generatePoints(20, -1)}
+				/>
+
 				<Sensor>
 					<Focus />
 					<Tooltip />
@@ -51,6 +64,7 @@ function generatePoints(length, sign = 1) {
 		.map((undef, index) => (0.1 < Math.random())
 			? {
 				x: index - length / 2,
+				// x: Math.random() * length,
 				y: (0.1 < Math.random())
 					? Math.sign(sign) * length * Math.random()
 					: null

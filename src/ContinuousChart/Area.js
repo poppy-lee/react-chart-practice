@@ -14,7 +14,8 @@ class Area extends React.Component {
 		points: PropTypes.arrayOf(
 			PropTypes.shape({
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-				y: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+				y0: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+				y1: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 			})
 		).isRequired,
 
@@ -76,14 +77,14 @@ class Area extends React.Component {
 		const {xScale, yScale} = this.getScales()
 
 		return this.props.points
-			.filter(({x, y}, index) => {
-				const {y: prevY} = (this.props.points[index - 1] || {})
-				const {y: nextY} = (this.props.points[index + 1] || {})
-				return Number.isFinite(y) && !(Number.isFinite(prevY) || Number.isFinite(nextY))
+			.filter(({x, y1}, index) => {
+				const {y1: prevY1} = (this.props.points[index - 1] || {})
+				const {y1: nextY1} = (this.props.points[index + 1] || {})
+				return Number.isFinite(y1) && !(Number.isFinite(prevY1) || Number.isFinite(nextY1))
 			})
-			.map(({x, y}, index) => (
+			.map(({x, y1}, index) => (
 				<circle key={index}
-					r={lineWidth} cx={xScale(x)} cy={yScale(y)}
+					r={lineWidth} cx={xScale(x)} cy={yScale(y1)}
 					stroke="none" fill={color}
 				/>
 			))
@@ -93,10 +94,10 @@ class Area extends React.Component {
 		const {xScale, yScale} = this.getScales()
 		return (
 			d3.area()
-				.defined((point) => point && Number.isFinite(point.y))
+				.defined((point) => point && Number.isFinite(point.y1))
 				.x(({x}) => xScale(x))
 				.y0(({y0}) => yScale(y0 || 0))
-				.y1(({y}) => yScale(y))
+				.y1(({y, y1}) => yScale(y1))
 		) (points)
 	}
 
@@ -104,9 +105,9 @@ class Area extends React.Component {
 		const {xScale, yScale} = this.getScales()
 		return (
 			d3.line()
-				.defined((point) => point && Number.isFinite(point.y))
+				.defined((point) => point && Number.isFinite(point.y1))
 				.x(({x}) => xScale(x))
-				.y1(({y}) => yScale(y))
+				.y(({y1}) => yScale(y1))
 		) (points)
 	}
 
