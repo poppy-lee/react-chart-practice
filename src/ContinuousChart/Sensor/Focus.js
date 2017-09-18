@@ -16,7 +16,7 @@ class Focus extends React.Component {
 		mouseX: PropTypes.number,
 		mouseY: PropTypes.number,
 		x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-		ys: PropTypes.arrayOf(
+		points: PropTypes.arrayOf(
 			PropTypes.shape({
 				color: PropTypes.string,
 				x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -39,7 +39,7 @@ class Focus extends React.Component {
 	render() {
 		const {
 			width, height, padding, xScale,
-			sticky, mouseX, mouseY, x, ys
+			sticky, mouseX, mouseY, x, points
 		} = this.props
 
 		return (
@@ -52,7 +52,7 @@ class Focus extends React.Component {
 						x2={xScale(x)} y2={height - padding.bottom}
 					/>
 				)}
-				{ys
+				{points
 					.filter(({y1}) => Number.isFinite(y1))
 					.map((point, index) => {
 						const {color, axisIndex, x, y0, y1} = point

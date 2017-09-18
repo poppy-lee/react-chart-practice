@@ -33,20 +33,18 @@ function render() {
 				<YAxis name="dollars" tickPrefix="$" />
 				{/* <YAxis name="dollars" tickValues={[-50, 0, 50]} tickPrefix="$" /> */}
 
-				<Line name="default" points={generatePoints(20)} />
+				<Line name="default" points={generatePoints(20, -1)} />
 				<Line background axis="dollars" name="dollars"
-					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 2}))}
+					points={[...new Array(21)].map((undef, index) => ({x: index, y: index}))}
 				/>
 				<Area line axis="dollars" group="dollars-area" name="dollars1"
-					points={[...new Array(21)].map((undef, index) => ({x: index, y0: index / 2, y1: index}))}
+					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
 				/>
 				<Area line axis="dollars" group="dollars-area" name="dollars2"
-					// points={[...new Array(21)].map((undef, index) => ({x: index, y: index}))}
-					points={generatePoints(20, -1)}
+					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
 				/>
 				<Area line axis="dollars" group="dollars-area" name="dollars3"
-					// points={[...new Array(21)].map((undef, index) => ({x: index, y: index}))}
-					points={generatePoints(20, -1)}
+					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
 				/>
 
 				<Sensor>

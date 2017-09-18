@@ -29,9 +29,7 @@ class Sensor extends React.Component {
 
 	findPoint = (mouseX) => {
 		const point = findClosestPoint(
-			this.props.points
-				.map(({x, ys}) => ({x, ys: ys.filter(({y}) => y !== null)}))
-				.filter(({ys}) => ys.length),
+			this.props.points.filter(({points}) => points.length),
 			+this.props.xScale.invert(mouseX)
 		)
 		return point && Number.isFinite(point.x) ? point : {}
@@ -40,9 +38,9 @@ class Sensor extends React.Component {
 	onMouseEvent = ({clientX, clientY}) => {
 		const mouseX = clientX - this.refs["sensor"].getBoundingClientRect().left
 		const mouseY = clientY - this.refs["sensor"].getBoundingClientRect().top
-		const {x, ys} = this.findPoint(mouseX)
+		const {x, points} = this.findPoint(mouseX)
 
-		this.setState({mouseX, mouseY, x, ys})
+		this.setState({mouseX, mouseY, x, points})
 	}
 
 	render() {
@@ -62,8 +60,8 @@ class Sensor extends React.Component {
 	}
 
 	shouldRenderChildComponents = () => {
-		const {mouseX, mouseY, ys} = this.state
-		return Number.isFinite(mouseX + mouseY) && ys && ys.length
+		const {mouseX, mouseY, points} = this.state
+		return Number.isFinite(mouseX + mouseY) && (points && points.length)
 	}
 
 	renderChildComponents = (props) => {

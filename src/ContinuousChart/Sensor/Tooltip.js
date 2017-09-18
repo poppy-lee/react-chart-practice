@@ -16,7 +16,7 @@ class Tooltip extends React.Component {
 		mouseX: PropTypes.number,
 		mouseY: PropTypes.number,
 		x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-		ys: PropTypes.arrayOf(
+		points: PropTypes.arrayOf(
 			PropTypes.shape({
 				color: PropTypes.string,
 				name: PropTypes.string,
@@ -43,9 +43,9 @@ class Tooltip extends React.Component {
 	}
 
 	render() {
-		const {sticky, x, ys} = this.props
+		const {sticky, x, points} = this.props
 		const xFormat = this.props.xFormat || ((x) => x)
-		const shouldRenderEtc = !!ys.slice(this.lineCounts).length
+		const shouldRenderEtc = !!points.slice(this.lineCounts).length
 		return (
 			<g ref="tooltip" className="tooltip">
 				<rect ref="tooltip-bg" rx="5" ry="5" fill="black" opacity="0.75" />
@@ -54,12 +54,12 @@ class Tooltip extends React.Component {
 						{xFormat(x)}
 					</text>
 				)}
-				{ys.slice(0, this.lineCounts - shouldRenderEtc).map(this.renderLine)}
+				{points.slice(0, this.lineCounts - shouldRenderEtc).map(this.renderLine)}
 				{shouldRenderEtc && (
 					this.renderLine({
 						color: "none",
-						name: `그 외 ${ys.length - 9}개`,
-						y: ys.slice(9).reduce((y, point) => y + (point.y || 0), 0)
+						name: `그 외 ${points.length - 9}개`,
+						y: points.slice(9).reduce((y, point) => y + (point.y || 0), 0)
 					}, 9)
 				)}
 			</g>

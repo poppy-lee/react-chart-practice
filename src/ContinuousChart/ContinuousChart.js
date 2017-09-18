@@ -110,23 +110,24 @@ class ContinuousChart extends React.Component {
 	}
 
 	getChartProps = () => {
+		const validateY = (number) => (typeof number === "number" && !Number.isNaN(number))
 		return this.getChildren(["Area", "Line"])
 			.map((child, index) => {
 				const {type, props} = child
-				const {axis, points, ...otherProps} = (props || {})
+				const {axis, group, points, ...otherProps} = (props || {})
 				return {
 					Component: type,
 					name: `y${index + 1}`,
 					color: this.props.colors[index % this.props.colors.length],
 					points: (points || [])
-						.filter((point) => point instanceof Object)
-						.filter((point) => point && Number.isFinite(point.x))
-						.sort(({x: xA}, {x: xB}) => xA - xB)
+						.filter((point) => point && point instanceof Object)
 						.map(({x, y, y0, y1}) => ({
 							x,
-							y0,
-							y1: Number.isFinite(y1) ? y1 : (Number.isFinite(y) ? y : null),
-						})),
+							y0: (y0 || 0),
+							y1: (validateY(y1) ? y1 : (validateY(y) ? y : null))
+						}))
+						.filter(({x, y0, y1}) => Number.isFinite(x))
+						.sort(({x: xA}, {x: xB}) => xA - xB),
 					...this.getYAxisProps(axis),
 					...otherProps,
 				}
@@ -134,6 +135,8 @@ class ContinuousChart extends React.Component {
 	}
 
 	getSensorProps = () => {
+		const validateY = (number) => (typeof number === "number" && !Number.isNaN(number))
+
 		const [xAxisProps] = this.getChildren("XAxis").slice(0, 1).map(({props}) => props || {})
 
 		const chartProps = this.getChartProps()
@@ -144,11 +147,11 @@ class ContinuousChart extends React.Component {
 			xFormat: (xAxisProps || {}).tickFormat,
 			points: xs.map((x) => ({
 				x,
-				ys: chartProps
-					.reduce((ys, {points, ...chartProps}, index) => {
-						const point = findPoint(points, x) || {}
-						return [...ys, {...chartProps, ...point}]
-							.filter(({x}) => Number.isFinite(x))
+				points: chartProps
+					.reduce((points, {points: currentPoints, ...chartProps}, index) => {
+						const point = findPoint(currentPoints, x) || {}
+						return [...points, {...chartProps, ...point}]
+							.filter(({x, y0, y1}) => Number.isFinite(x) && validateY(y1))
 					}, [])
 			})),
 		}
