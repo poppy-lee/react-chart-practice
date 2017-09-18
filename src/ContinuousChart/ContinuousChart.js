@@ -134,38 +134,36 @@ class ContinuousChart extends React.Component {
 				}
 			})
 
-		const pointsByGroup = chartProps
-			.filter(({group}) => group)
-			.reduce((pointsByGroup, {group, points}) => ({
-				...pointsByGroup,
-				[group]: [...(pointsByGroup[group] || []), ...(points || [])],
-			}), [])
 		const prevPoints = {}
+		const pointsByGroup = chartProps
+		.filter(({group}) => group)
+		.reduce((pointsByGroup, {group, points}) => ({
+			...pointsByGroup,
+			[group]: [...(pointsByGroup[group] || []), ...(points || [])],
+		}), [])
 
-		return chartProps
-			.map(({group, points, ...otherProps}) => {
-				prevPoints[group] = (prevPoints[group] || [])
-				return {
-					...otherProps,
-					group,
-					points: !group ? points
-						: [...new Set(pointsByGroup[group].map(({x}) => x))]
-							.sort((a, b) => a - b)
-							.map((x) => {
-								const prevPoint = prevPoints[group].find(({x: prevX}) => prevX === x) || {}
-								const currPoint = points.find((point) => point.x === x) || {}
-								const nextPoint = {
-									x,
-									y0: (prevPoint.y1 || 0) + (currPoint.y0 || 0),
-									y1: (prevPoint.y1 || 0) + (currPoint.y1 || 0),
-								}
-								prevPoints[group] = prevPoints[group]
-									.filter(({x: prevX}) => prevX !== x)
-									.concat(nextPoint)
-								return nextPoint
-							})
-				}
-			})
+		return chartProps.map(({group, points, ...otherProps}) => ({
+			...otherProps,
+			group,
+			points: group
+				? [...new Set(pointsByGroup[group].map(({x}) => x))]
+					.sort((a, b) => a - b)
+					.map((x) => {
+						prevPoints[group] = (prevPoints[group] || [])
+						const prevPoint = prevPoints[group].find(({x: prevX}) => prevX === x) || {}
+						const currPoint = points.find((point) => point.x === x) || {}
+						const nextPoint = {
+							x,
+							y0: (prevPoint.y1 || 0) + (currPoint.y0 || 0),
+							y1: (prevPoint.y1 || 0) + (currPoint.y1 || 0),
+						}
+						prevPoints[group] = prevPoints[group]
+							.filter(({x: prevX}) => prevX !== x)
+							.concat(nextPoint)
+						return nextPoint
+					})
+				: points
+		}))
 	}
 
 	getSensorProps = () => {
