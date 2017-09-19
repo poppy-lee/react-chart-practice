@@ -1,17 +1,17 @@
 
-.linear-chart .sensor {
+.continuous-chart .sensor {
 	pointer-events: all;
 }
-.linear-chart .sensor .focus,
-.linear-chart .sensor .tooltip {
+.continuous-chart .sensor .focus,
+.continuous-chart .sensor .tooltip {
 	pointer-events: none;
 }
 
-.linear-chart .sensor >rect {
+.continuous-chart .sensor >rect {
 	fill: none;
 }
 
-.linear-chart .sensor .tooltip text {
+.continuous-chart .sensor .tooltip text {
 	font-size: 11px;
 	fill: #ffffff;
 }

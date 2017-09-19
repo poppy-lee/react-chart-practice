@@ -1,12 +1,12 @@
 
-.linear-chart text {
+.continuous-chart text {
 	font-family: sans-serif;
 }
 
-.linear-chart >.axis >.tick text {
+.continuous-chart >.axis >.tick text {
 	font-size: 10px;
 	fill: #777777;
 }
-.linear-chart >.axis.axis-x >.tick.tick-x text {
+.continuous-chart >.axis.axis-x >.tick.tick-x text {
 	text-anchor: middle;
 }

@@ -3,6 +3,12 @@ import "./ContinuousChart.css"
 
 import * as d3 from "d3"
 
+import {
+	XAxis, YAxis,
+	Area, Line,
+	Sensor,
+} from "./"
+
 import PropTypes from "prop-types"
 import React from "react"
 
@@ -39,7 +45,7 @@ class ContinuousChart extends React.Component {
 
     return (
 			<svg
-				className="linear-chart"
+				className="continuous-chart"
 				width={String(width)} height={String(height)}
 			>
 				{this.renderYAxes(commonProps)}
@@ -51,7 +57,7 @@ class ContinuousChart extends React.Component {
 	}
 
 	renderXAxes = (commonProps = {}) => {
-		return this.getChildren("XAxis").slice(0, 1)
+		return this.getChildren(XAxis).slice(0, 1)
 			.map((child, index) => (
 				<child.type key={`axis-x-${index}`} {...{
 					...commonProps,
@@ -60,7 +66,7 @@ class ContinuousChart extends React.Component {
 			))
 	}
 	renderYAxes = (commonProps = {}) => {
-		return this.getChildren("YAxis").slice(0, 2)
+		return this.getChildren(YAxis).slice(0, 2)
 			.map((child, index, yAxes) => (
 				<child.type key={`axis-y-${index}`} {...{
 					axisIndex: index,
@@ -80,7 +86,7 @@ class ContinuousChart extends React.Component {
 			))
 	}
 	renderSensor = (commonProps = {}) => {
-		return this.getChildren("Sensor")
+		return this.getChildren(Sensor)
 			.map((child, index) => (
 				<child.type key={`sensor-${index}`} {...{
 					...commonProps,
@@ -94,11 +100,11 @@ class ContinuousChart extends React.Component {
 		types = [].concat(types)
 		return [].concat(this.props.children)
 			.reduce((children, child) => children.concat(child || []), [])
-			.filter(({type = () => null}) => !types.length || types.includes(type.name))
+			.filter(({type = () => null}) => !types.length || types.includes(type) || types.includes(type.name))
 	}
 
 	getYAxisProps = (axisName) => {
-		const yAxisProps = this.getChildren("YAxis").slice(0, 2)
+		const yAxisProps = this.getChildren(YAxis).slice(0, 2)
 			.map(({props}) => props || {})
 			.map(({name: axis, ...yAxisProps}, axisIndex, axes) => ({
 				axis, axisIndex,
@@ -111,7 +117,7 @@ class ContinuousChart extends React.Component {
 
 	getChartProps = () => {
 		return groupChartProps(
-			this.getChildren(["Area", "Line"])
+			this.getChildren([Area, Line])
 			.map((child, index) => {
 				const {type, props} = child
 				const {axis, points, ...otherProps} = (props || {})
@@ -130,10 +136,10 @@ class ContinuousChart extends React.Component {
 	getSensorProps = () => {
 		const validateY = (number) => (typeof number === "number" && !Number.isNaN(number))
 
-		const [xAxisProps] = this.getChildren("XAxis").slice(0, 1).map(({props}) => props || {})
+		const [xAxisProps] = this.getChildren(XAxis).slice(0, 1).map(({props}) => props || {})
 
 		const chartProps = this.getChartProps()
-		const points = chartProps.reduce((points, props) => points.concat(props.points || []), [])
+		const points = chartProps.reduce((points, props) => [...points, ...props.points], [])
 		const xs = [...new Set(points.map(({x}) => x))].sort((a, b) => (a - b))
 
 		return {
@@ -237,10 +243,10 @@ class ContinuousChart extends React.Component {
 
 	getValuesByAxis = () => {
 		const chartProps = this.getChartProps()
-		const points = chartProps.reduce((points, props) => points.concat(props.points), [])
+		const points = chartProps.reduce((points, props) => [...points, ...props.points], [])
 
-		const xAxes = this.getChildren("XAxis").slice(0, 1)
-		const yAxes = this.getChildren("YAxis").slice(0, 2)
+		const xAxes = this.getChildren(XAxis).slice(0, 1)
+		const yAxes = this.getChildren(YAxis).slice(0, 2)
 
 		const [xAxisValues] = !xAxes.length ? [points.map(({x}) => x)]
 			: xAxes.reduce((xsArray, {props: axisProps = {}}, index) => [
