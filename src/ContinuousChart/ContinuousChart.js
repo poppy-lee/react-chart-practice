@@ -110,9 +110,8 @@ class ContinuousChart extends React.Component {
 	}
 
 	getChartProps = () => {
-		const validateY = (number) => (typeof number === "number" && !Number.isNaN(number))
-
-		const chartProps = this.getChildren(["Area", "Line"])
+		return groupChartProps(
+			this.getChildren(["Area", "Line"])
 			.map((child, index) => {
 				const {type, props} = child
 				const {axis, points, ...otherProps} = (props || {})
@@ -120,50 +119,12 @@ class ContinuousChart extends React.Component {
 					Component: type,
 					name: `y${index + 1}`,
 					color: this.props.colors[index % this.props.colors.length],
-					points: (points || [])
-					.map((point) => point || {})
-					.map(({x, y, y0, y1} = {}) => ({
-						x,
-						y0: (y0 || 0),
-						y1: (validateY(y1) ? y1 : (validateY(y) ? y : null)),
-					}))
-					.filter(({x, y0, y1}) => Number.isFinite(x))
-					.sort(({x: xA}, {x: xB}) => xA - xB),
+					points: formatPointsWithY0Y1(points),
 					...this.getYAxisProps(axis),
 					...otherProps,
 				}
 			})
-
-		const prevPoints = {}
-		const pointsByGroup = chartProps
-		.filter(({group}) => group)
-		.reduce((pointsByGroup, {group, points}) => ({
-			...pointsByGroup,
-			[group]: [...(pointsByGroup[group] || []), ...(points || [])],
-		}), [])
-
-		return chartProps.map(({group, points, ...otherProps}) => ({
-			...otherProps,
-			group,
-			points: group
-				? [...new Set(pointsByGroup[group].map(({x}) => x))]
-					.sort((a, b) => a - b)
-					.map((x) => {
-						prevPoints[group] = (prevPoints[group] || [])
-						const prevPoint = prevPoints[group].find(({x: prevX}) => prevX === x) || {}
-						const currPoint = points.find((point) => point.x === x) || {}
-						const nextPoint = {
-							x,
-							y0: (prevPoint.y1 || 0) + (currPoint.y0 || 0),
-							y1: (prevPoint.y1 || 0) + (currPoint.y1 || 0),
-						}
-						prevPoints[group] = prevPoints[group]
-							.filter(({x: prevX}) => prevX !== x)
-							.concat(nextPoint)
-						return nextPoint
-					})
-				: points
-		}))
+		)
 	}
 
 	getSensorProps = () => {
@@ -335,4 +296,46 @@ function findPoint(points, x, leftIdx, rightIdx) {
 	if (leftIdx >= rightIdx) return undefined
 	if (point.x < x) return findPoint(points, x, midIdx + 1, rightIdx)
 	if (point.x > x) return findPoint(points, x, leftIdx, midIdx)
+}
+
+function formatPointsWithY0Y1(points) {
+	const validateY = (number) => (typeof number === "number" && !Number.isNaN(number))
+	return (points || [])
+		.map((point) => point || {})
+		.map(({x, y, y0, y1} = {}) => ({
+			x,
+			y0: (y0 || 0),
+			y1: (validateY(y1) ? y1 : (validateY(y) ? y : null)),
+		}))
+		.filter(({x, y0, y1}) => Number.isFinite(x))
+		.sort(({x: xA}, {x: xB}) => xA - xB)
+}
+
+function groupChartProps(chartProps) {
+	chartProps = (chartProps || [])
+	const pointsByGroup = {}
+	const xValuesByGroup = chartProps
+		.filter(({group}) => group)
+		.reduce((xValuesByGroup, {group, points}) => ({
+			...xValuesByGroup,
+			[group]: [...new Set([
+				...(xValuesByGroup[group] || []),
+				...(points || []).map(({x}) => x)
+			])].sort((a, b) => a - b),
+		}), {})
+	return chartProps.map(({group, points, ...otherProps}) => ({
+		...otherProps,
+		group,
+		points: !group ? points
+			: xValuesByGroup[group].map((x) => {
+				pointsByGroup[group] = (pointsByGroup[group] || {})
+				const prevPoint = (pointsByGroup[group][x] || {})
+				const currPoint = (points.find((point) => point.x === x) || {})
+				return pointsByGroup[group][x] = {
+					x,
+					y0: (prevPoint.y1 || 0) + (currPoint.y0 || 0),
+					y1: (prevPoint.y1 || 0) + (currPoint.y1 || 0),
+				}
+			})
+	}))
 }

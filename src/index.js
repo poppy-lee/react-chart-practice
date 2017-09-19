@@ -33,10 +33,14 @@ function render() {
 				<YAxis name="dollars" tickPrefix="$" />
 				{/* <YAxis name="dollars" tickValues={[-50, 0, 50]} tickPrefix="$" /> */}
 
-				<Line name="default" points={generatePoints(20, -1)} />
+				<Line background name="default1" points={generatePoints(20, -1)} />
+				<Line background name="default2" points={generatePoints(20, -1)} />
+				<Line background name="default3" points={generatePoints(20, -1)} />
+
 				<Line background axis="dollars" name="dollars"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: index}))}
 				/>
+
 				<Area line axis="dollars" group="dollars-area" name="dollars1"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
 					points={generatePoints(20)}
