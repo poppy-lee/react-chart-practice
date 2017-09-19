@@ -61,7 +61,7 @@ class ContinuousChart extends React.Component {
 			.map((child, index) => (
 				<child.type key={`axis-x-${index}`} {...{
 					...commonProps,
-					...(child.props || {}),
+					...child.props,
 				}} />
 			))
 	}
@@ -72,16 +72,17 @@ class ContinuousChart extends React.Component {
 					axisIndex: index,
 					axisCount: yAxes.length,
 					...commonProps,
-					...(child.props || {}),
+					...child.props,
 				}} />
 			))
 	}
 	renderCharts = (commonProps = {}) => {
-		return this.getChartProps()
-			.map(({Component, ...chartProps}, index) => (
-				<Component key={`chart${index}`} {...{
+		const chartProps = this.getChartProps()
+		return this.getChildren([Area, Line])
+			.map((child, index) => (
+				<child.type key={`chart-${index}`} {...{
 					...commonProps,
-					...chartProps,
+					...chartProps[index],
 				}} />
 			))
 	}
@@ -91,7 +92,7 @@ class ContinuousChart extends React.Component {
 				<child.type key={`sensor-${index}`} {...{
 					...commonProps,
 					...this.getSensorProps(),
-					...(child.props || {}),
+					...child.props,
 				}} />
 			))
 	}
@@ -99,13 +100,17 @@ class ContinuousChart extends React.Component {
 	getChildren = (types = []) => {
 		types = [].concat(types)
 		return [].concat(this.props.children)
-			.reduce((children, child) => children.concat(child || []), [])
-			.filter(({type = () => null}) => !types.length || types.includes(type) || types.includes(type.name))
+			.map(({type, props, ...otherProps}) => ({
+				type: (type || (() => null)),
+				props: (props || {}),
+				...otherProps,
+			}))
+			.filter(({type}) => !types.length || types.includes(type) || types.includes(type.name))
 	}
 
 	getYAxisProps = (axisName) => {
 		const yAxisProps = this.getChildren(YAxis).slice(0, 2)
-			.map(({props}) => props || {})
+			.map(({props}) => props)
 			.map(({name: axis, ...yAxisProps}, axisIndex, axes) => ({
 				axis, axisIndex,
 				yPrefix: yAxisProps.tickPrefix,
@@ -118,24 +123,18 @@ class ContinuousChart extends React.Component {
 	getChartProps = () => {
 		return groupChartProps(
 			this.getChildren([Area, Line])
-			.map((child, index) => {
-				const {type, props} = child
-				const {axis, points, ...otherProps} = (props || {})
-				return {
-					Component: type,
-					name: `y${index + 1}`,
-					color: this.props.colors[index % this.props.colors.length],
-					points: formatPointsWithY0Y1(points),
-					...this.getYAxisProps(axis),
-					...otherProps,
-				}
-			})
+			.map(({props}) => props)
+			.map(({axis, points, ...otherProps}, index) => ({
+				name: `y${index + 1}`,
+				color: this.props.colors[index % this.props.colors.length],
+				...this.getYAxisProps(axis),
+				...otherProps,
+				points: formatPoints(points),
+			}))
 		)
 	}
 
 	getSensorProps = () => {
-		const validateY = (number) => (typeof number === "number" && !Number.isNaN(number))
-
 		const [xAxisProps] = this.getChildren(XAxis).slice(0, 1).map(({props}) => props || {})
 
 		const chartProps = this.getChartProps()
@@ -146,12 +145,12 @@ class ContinuousChart extends React.Component {
 			xFormat: (xAxisProps || {}).tickFormat,
 			points: xs.map((x) => ({
 				x,
-				points: chartProps
-					.reduce((points, {points: currentPoints, ...chartProps}, index) => {
-						const point = findPoint(currentPoints, x) || {}
-						return [...points, {...chartProps, ...point}]
-							.filter(({x, y0, y1}) => Number.isFinite(x) && validateY(y1))
-					}, [])
+				points: formatPoints(
+					chartProps.reduce((points, {points: currentPoints, ...chartProps}) => [
+						...points,
+						{...chartProps, ...(findPoint(currentPoints, x) || {})},
+					], [])
+				),
 			})),
 		}
 	}
@@ -304,11 +303,12 @@ function findPoint(points, x, leftIdx, rightIdx) {
 	if (point.x > x) return findPoint(points, x, leftIdx, midIdx)
 }
 
-function formatPointsWithY0Y1(points) {
+function formatPoints(points) {
 	const validateY = (number) => (typeof number === "number" && !Number.isNaN(number))
 	return (points || [])
 		.map((point) => point || {})
-		.map(({x, y, y0, y1} = {}) => ({
+		.map(({x, y, y0, y1, ...otherProps} = {}) => ({
+			...otherProps,
 			x,
 			y0: (y0 || 0),
 			y1: (validateY(y1) ? y1 : (validateY(y) ? y : null)),
