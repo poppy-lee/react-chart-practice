@@ -305,7 +305,7 @@ function findPoint(points, x, leftIdx, rightIdx) {
 
 function formatPoints(points) {
 	const validateY = (number) => (typeof number === "number" && !Number.isNaN(number))
-	return (points || [])
+	return (points instanceof Array ? points : [])
 		.map((point) => point || {})
 		.map(({x, y, y0, y1, ...otherProps} = {}) => ({
 			...otherProps,
@@ -326,7 +326,7 @@ function groupChartProps(chartProps) {
 			...xValuesByGroup,
 			[group]: [...new Set([
 				...(xValuesByGroup[group] || []),
-				...(points || []).map(({x}) => x)
+				...points.map(({x}) => x)
 			])].sort((a, b) => a - b),
 		}), {})
 	return chartProps.map(({group, points, ...otherProps}) => ({
