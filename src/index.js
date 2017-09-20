@@ -3,9 +3,7 @@ import ReactDOM from "react-dom"
 
 import {
 	ContinuousChart,
-		XAxis, YAxis,
-		Area, Line,
-		Sensor,
+		XAxis, YAxis, Path, Sensor,
 			Focus, Tooltip
 } from "./ContinuousChart"
 
@@ -33,34 +31,42 @@ function render() {
 				<YAxis name="dollars" tickPrefix="$" />
 				{/* <YAxis name="dollars" tickValues={[-50, 0, 50]} tickPrefix="$" /> */}
 
-				<Line background name="default1" points={generatePoints(20, -1)} />
-				<Line background name="default2" points={generatePoints(20, -1)} />
-				<Line background name="default3" points={generatePoints(20, -1)} />
+				<Path name="default1" points={generatePoints(20)} />
+				<Path stroke={false} fill fillOpacity={0.5}
+					name="default2" points={generatePoints(20)}
+				/>
+				<Path stroke={false} fillGradient fillOpacity="0.5"
+					name="default3" points={generatePoints(20)}
+				/>
 
-				<Line background axis="dollars" name="dollars"
+				<Path fillGradient
+					axis="dollars" name="dollars"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: index}))}
 				/>
 
-				<Area line axis="dollars" group="dollars-area" name="dollars1"
-					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
-					points={generatePoints(20)}
+				<Path fill
+					axis="dollars" group="dollars-area" name="dollars1"
+					points={generatePoints(20, -1)}
 				/>
-				<Area line axis="dollars" group="dollars-area" name="dollars2"
-					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
-					points={generatePoints(20)}
+				<Path fill
+					axis="dollars" group="dollars-area" name="dollars2"
+					points={generatePoints(20, -1)}
 				/>
-				<Area line axis="dollars" group="dollars-area" name="dollars3"
-					points={[...new Array(21)].map((undef, index) => ({x: index, y: index / 3}))}
-					points={generatePoints(20)}
+				<Path fill
+					axis="dollars" group="dollars-area" name="dollars3"
+					points={generatePoints(20, -1)}
 				/>
 
-				<Area line axis="percent" group name="percent1"
+				<Path stroke={false} fill
+					axis="percent" group name="percent1"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: -index / 3}))}
 				/>
-				<Area line axis="percent" group name="percent2"
+				<Path stroke={false} fill
+					axis="percent" group name="percent2"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: -index / 3}))}
 				/>
-				<Area line axis="percent" group name="percent3"
+				<Path stroke={false} fill
+					axis="percent" group name="percent3"
 					points={[...new Array(21)].map((undef, index) => ({x: index, y: -index / 3}))}
 				/>
 

@@ -3,11 +3,7 @@ import "./ContinuousChart.css"
 
 import * as d3 from "d3"
 
-import {
-	XAxis, YAxis,
-	Area, Line,
-	Sensor,
-} from "./"
+import {XAxis, YAxis, Path, Sensor} from "./"
 
 import PropTypes from "prop-types"
 import React from "react"
@@ -78,7 +74,7 @@ class ContinuousChart extends React.Component {
 	}
 	renderCharts = (commonProps = {}) => {
 		const chartProps = this.getChartProps()
-		return this.getChildren([Area, Line])
+		return this.getChildren(Path)
 			.map((child, index) => (
 				<child.type key={`chart-${index}`} {...{
 					...commonProps,
@@ -122,7 +118,7 @@ class ContinuousChart extends React.Component {
 
 	getChartProps = () => {
 		return groupChartProps(
-			this.getChildren([Area, Line])
+			this.getChildren(Path)
 			.map(({props}) => props)
 			.map(({axis, points, ...otherProps}, index) => ({
 				name: `y${index + 1}`,
