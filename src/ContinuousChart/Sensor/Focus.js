@@ -12,7 +12,6 @@ class Focus extends React.Component {
 		yScale: PropTypes.func,
 		y1Scale: PropTypes.func,
 
-		sticky: PropTypes.bool,
 		mouseX: PropTypes.number,
 		mouseY: PropTypes.number,
 		x: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -39,19 +38,11 @@ class Focus extends React.Component {
 	render() {
 		const {
 			width, height, padding, xScale,
-			sticky, mouseX, mouseY, x, points
+			mouseX, mouseY, x, points
 		} = this.props
 
 		return (
 			<g className="focus">
-				{!sticky && (
-					<line
-						stroke="#777777"
-						strokeDasharray="3,3"
-						x1={xScale(x)} y1={padding.top}
-						x2={xScale(x)} y2={height - padding.bottom}
-					/>
-				)}
 				{points
 					.filter(({y1}) => Number.isFinite(y1))
 					.map((point, index) => {
