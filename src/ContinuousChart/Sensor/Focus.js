@@ -43,6 +43,12 @@ class Focus extends React.Component {
 
 		return (
 			<g className="focus">
+				<line
+					stroke="#777777"
+					strokeDasharray="3,3"
+					x1={xScale(x)} y1={padding.top}
+					x2={xScale(x)} y2={height - padding.bottom}
+				/>
 				{points
 					.filter(({y1}) => Number.isFinite(y1))
 					.map((point, index) => {

@@ -48,6 +48,9 @@ class Tooltip extends React.Component {
 		return (
 			<g ref="tooltip" className="tooltip">
 				<rect ref="tooltip-bg" rx="5" ry="5" fill="black" opacity="0.75" />
+				<text x={this.padding} y={this.padding + this.textY}>
+					{xFormat(x)}
+				</text>
 				{points.slice(0, this.lineCounts - shouldRenderEtc).map(this.renderLine)}
 				{shouldRenderEtc && (
 					this.renderLine({
