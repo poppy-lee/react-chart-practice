@@ -23,7 +23,7 @@ module.exports = {
 				include: path.resolve("src"),
 				loader: "babel-loader",
 				options: {
-          presets: [["es2015", {"modules": false}], "react", "stage-0"]
+          presets: [["env", {"modules": false}], "react", "stage-0"]
         }
 			},
 			{
