@@ -1,5 +1,3 @@
-import "./Sensor.css"
-
 import PropTypes from "prop-types"
 import React from "react"
 
@@ -36,8 +34,8 @@ class Sensor extends React.Component {
 	}
 
 	onMouseEvent = ({clientX, clientY}) => {
-		const mouseX = clientX - this.refs["sensor"].getBoundingClientRect().left
-		const mouseY = clientY - this.refs["sensor"].getBoundingClientRect().top
+		const mouseX = clientX - this.sensorRect.getBoundingClientRect().left
+		const mouseY = clientY - this.sensorRect.getBoundingClientRect().top
 		const {x, points} = this.findPoint(mouseX)
 
 		this.setState({mouseX, mouseY, x, points})
@@ -48,12 +46,15 @@ class Sensor extends React.Component {
 
 		return (
 			<g
-				className="sensor"
 				onMouseEnter={this.onMouseEvent}
 				onMouseMove={this.onMouseEvent}
 				onMouseLeave={() => this.setState(initialState)}
+				style={{ pointerEvents: "all" }}
 			>
-				<rect ref="sensor" width={String(width)} height={String(height)} />
+				<rect ref={node => (this.sensorRect = node)}
+					width={String(width)} height={String(height)}
+					style={{ fill: "none" }}
+				/>
 				{this.renderChildComponents({...this.props, ...this.state})}
 			</g>
 		)

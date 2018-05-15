@@ -6,9 +6,22 @@ const webpack = require("webpack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = {
+	mode: "production",
 	entry: [
+		"@babel/polyfill",
 		path.resolve("src/index.js")
 	],
+	optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        },
+      },
+    },
+  },
 	output: {
 		filename: "dist.[name].js",
 		path: path.resolve("build"),
@@ -22,16 +35,13 @@ module.exports = {
 				include: path.resolve("src"),
 				loader: "babel-loader",
 				options: {
-          presets: [["env", {"modules": false}], "react", "stage-0"]
+          presets: [
+						"@babel/preset-env",
+						"@babel/preset-stage-3",
+						"@babel/preset-react",
+					]
         },
 			},
-			{
-        test: /\.css$/,
-        use: [
-          {loader: "style-loader"},
-          {loader: "css-loader"},
-        ]
-      },
 		],
 	},
 	plugins: [
@@ -48,14 +58,5 @@ module.exports = {
 		host: "0.0.0.0",
 		publicPath: "/",
 		historyApiFallback: true,
-		stats: {
-			colors: true,
-			timings: true, version: true,
-			errors: true, warnings: true,
-			assets: true, modules: false,
-			cached: true, cachedAssets: false,
-			chunks: false, chunkModules: false, chunkOrigins: false,
-			usedExports: false,
-		},
 	},
 }

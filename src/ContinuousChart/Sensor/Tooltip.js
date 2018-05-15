@@ -1,7 +1,15 @@
-import PropTypes from "prop-types"
 import React from "react"
+import PropTypes from "prop-types"
+import styled from 'styled-components'
 
 import format from "../../lib/format"
+
+const StyledTooltipGroup = styled.g`
+	text {
+		font-size: 11px;
+		fill: #ffffff;
+	}
+`
 
 export default
 class Tooltip extends React.Component {
@@ -46,8 +54,12 @@ class Tooltip extends React.Component {
 		const xFormat = this.props.xFormat || ((x) => x)
 		const shouldRenderEtc = !!points.slice(this.lineCounts).length
 		return (
-			<g ref="tooltip" className="tooltip">
-				<rect ref="tooltip-bg" rx="5" ry="5" fill="black" opacity="0.75" />
+			<StyledTooltipGroup innerRef={node => (this.tooltip = node)}
+				style={{ pointerEvents: "none" }}
+			>
+				<rect ref={node => (this.tooltipBg = node)}
+					rx="5" ry="5" fill="black" opacity="0.75"
+				/>
 				<text x={this.padding} y={this.padding + this.textY}>
 					{xFormat(x)}
 				</text>
@@ -59,7 +71,7 @@ class Tooltip extends React.Component {
 						y: points.slice(9).reduce((y, point) => y + (point.y || 0), 0)
 					}, 9)
 				)}
-			</g>
+			</StyledTooltipGroup>
 		)
 	}
 
@@ -70,7 +82,9 @@ class Tooltip extends React.Component {
 		return (
 			<g key={index} transform={`translate(${contentX}, ${contentY})`}>
 				<circle r="5" cx="2.5" cy="6" stroke="none" fill={color} />
-				<text className="name" x="13" y={this.textY}>{name}</text>
+				<text className="name" x="13" y={this.textY}>
+					{name}
+				</text>
 				<text className="value" y={this.textY} textAnchor="end">
 					{(y1 - y0) < 0 && "-"}
 					{isNumber && yPrefix}
@@ -87,8 +101,8 @@ class Tooltip extends React.Component {
 			mouseX, mouseY
 		} = this.props
 
-		const tooltip = this.refs["tooltip"]
-		const tooltipBg = this.refs["tooltip-bg"]
+		const tooltip = this.tooltip
+		const tooltipBg = this.tooltipBg
 		const tooltipNames = tooltip.querySelectorAll(".name")
 		const tooltipValues = tooltip.querySelectorAll(".value")
 

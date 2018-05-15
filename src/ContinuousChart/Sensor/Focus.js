@@ -42,7 +42,7 @@ class Focus extends React.Component {
 		} = this.props
 
 		return (
-			<g className="focus">
+			<g style={{ pointerEvents: "none" }}>
 				<line
 					stroke="#777777"
 					strokeDasharray="3,3"

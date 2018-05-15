@@ -31,11 +31,11 @@ function render() {
 				<YAxis name="dollars" tickPrefix="$" />
 				{/* <YAxis name="dollars" tickValues={[-50, 0, 50]} tickPrefix="$" /> */}
 
-				<Path name="default1" points={generatePoints(20)} />
-				<Path stroke={false} fill fillOpacity={0.5}
-					name="default2" points={generatePoints(20)}
+				<Path name="default1" points={generatePoints(100)} />
+				<Path stroke={false} fillGradient fillOpacity={0.5}
+					name="default2" points={generatePoints(100)}
 				/>
-				<Path stroke={false} fillGradient fillOpacity="0.5"
+				<Path stroke={false} fill fillOpacity="0.5"
 					name="default3" points={generatePoints(20)}
 				/>
 

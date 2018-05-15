@@ -1,7 +1,15 @@
-import PropTypes from "prop-types"
 import React from "react"
+import PropTypes from "prop-types"
+import styled from "styled-components"
 
 import humanize from "../lib/humanize"
+
+const StyledYTickGroup = styled.g`
+	text {
+		font-size: 10px;
+		fill: #777777;
+	}
+`
 
 export default
 class YAxis extends React.Component {
@@ -57,8 +65,7 @@ class YAxis extends React.Component {
 			: (!axisIndex ? padding.left + 5 : width - padding.right)
 
 		return (
-			<g key={y}
-				className="tick tick-y"
+			<StyledYTickGroup key={y}
 				transform={`translate(0, ${yScale(y)})`}
 			>
 				<line stroke="#bbbbbb" x1={x1} y1="0" x2={x2} y2="0" />
@@ -68,7 +75,7 @@ class YAxis extends React.Component {
 				>
 					{y < 0 && "-"}{tickPrefix}{humanize(Math.abs(y))}{tickPostfix}
 				</text>
-			</g>
+			</StyledYTickGroup>
 		)
 	}
 

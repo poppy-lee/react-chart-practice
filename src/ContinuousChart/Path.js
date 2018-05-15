@@ -1,7 +1,6 @@
-import * as d3 from "d3"
-
-import PropTypes from "prop-types"
 import React from "react"
+import PropTypes from "prop-types"
+import { area, line } from "d3"
 
 export default
 class Path extends React.Component {
@@ -134,7 +133,7 @@ class Path extends React.Component {
 	getAreaDescription = (points = this.props.points) => {
 		const {xScale, yScale} = this.getScales()
 		return (
-			d3.area()
+			area()
 				.defined((point) => point && Number.isFinite(point.y1))
 				.x(({x}) => xScale(x))
 				.y0(({y0}) => yScale(y0))
@@ -145,7 +144,7 @@ class Path extends React.Component {
 	getLineDescription = (points = this.props.points) => {
 		const {xScale, yScale} = this.getScales()
 		return (
-			d3.line()
+			line()
 				.defined((point) => point && Number.isFinite(point.y1))
 				.x(({x}) => xScale(x))
 				.y(({y1}) => yScale(y1))

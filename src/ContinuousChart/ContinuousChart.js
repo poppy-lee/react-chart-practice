@@ -1,12 +1,19 @@
-import "babel-polyfill"
-import "./ContinuousChart.css"
-
-import * as d3 from "d3"
+import PropTypes from "prop-types"
+import React from "react"
+import styled from "styled-components"
+import {
+	schemeCategory10 as d3DefaultColors,
+	scaleLinear,
+	scaleUtc,
+} from "d3"
 
 import {XAxis, YAxis, Path, Sensor} from "./"
 
-import PropTypes from "prop-types"
-import React from "react"
+const StyledSVG = styled.svg`
+	text {
+		font-family: sans-serif;
+	}
+`
 
 export default
 class ContinuousChart extends React.Component {
@@ -25,7 +32,7 @@ class ContinuousChart extends React.Component {
 	static defaultProps = {
 		width: 0,
 		height: 0,
-		colors: d3.schemeCategory10,
+		colors: d3DefaultColors,
 	}
 
 	componentWillMount() {
@@ -40,15 +47,14 @@ class ContinuousChart extends React.Component {
 		}
 
     return (
-			<svg
-				className="continuous-chart"
+			<StyledSVG
 				width={String(width)} height={String(height)}
 			>
 				{this.renderYAxes(commonProps)}
 				{this.renderXAxes(commonProps)}
 				{this.renderCharts(commonProps)}
 				{this.renderSensor(commonProps)}
-			</svg>
+			</StyledSVG>
     )
 	}
 
@@ -180,13 +186,13 @@ class ContinuousChart extends React.Component {
 			.filter((interval) => interval)
 
 		return {
-			xScale: ((Math.min(...intervals) % dayInterval) ? d3.scaleLinear() : d3.scaleUtc())
+			xScale: ((Math.min(...intervals) % dayInterval) ? scaleLinear() : scaleUtc())
 				.domain(xDomain)
 				.range([padding.left + 10, width - (padding.right + 10)]),
-			yScale: d3.scaleLinear()
+			yScale: scaleLinear()
 				.domain(yDomain)
 				.range([height - padding.bottom, padding.top]),
-			y1Scale: d3.scaleLinear()
+			y1Scale: scaleLinear()
 				.domain(y1Domain)
 				.range([height - padding.bottom, padding.top]),
 		}

@@ -1,5 +1,14 @@
-import PropTypes from "prop-types"
 import React from "react"
+import PropTypes from "prop-types"
+import styled from "styled-components"
+
+const StyledXTickGroup = styled.g`
+	text {
+		font-size: 10px;
+		fill: #777777;
+		text-anchor: middle;
+	}
+`
 
 export default
 class XAxis extends React.Component {
@@ -33,15 +42,14 @@ class XAxis extends React.Component {
 	renderTick = (x) => {
 		const {height, padding, xScale, tickFormat} = this.props
 		return (
-			<g key={x}
-				className="tick tick-x"
+			<StyledXTickGroup key={x}
 				transform={`translate(${xScale(x)}, ${height - padding.bottom})`}
 			>
 				<line stroke="#bbbbbb" x1="0" y1="0" x2="0" y2="5" />
 				<text y="18">
 					{typeof tickFormat === "function" ? tickFormat(x) : x}
 				</text>
-			</g>
+			</StyledXTickGroup>
 		)
 	}
 
