@@ -35,11 +35,13 @@ module.exports = {
 				include: path.resolve("src"),
 				loader: "babel-loader",
 				options: {
+					plugins: [
+						["@babel/plugin-proposal-class-properties", { loose: true }],
+					],
           presets: [
 						"@babel/preset-env",
-						"@babel/preset-stage-3",
 						"@babel/preset-react",
-					]
+					],
         },
 			},
 		],
