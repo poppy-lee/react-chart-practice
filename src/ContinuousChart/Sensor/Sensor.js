@@ -25,6 +25,8 @@ class Sensor extends React.Component {
 
 	state = initialState
 
+	sensorRectRef = React.createRef()
+
 	findPoint = (mouseX) => {
 		const point = findClosestPoint(
 			this.props.points.filter(({points}) => points.length),
@@ -34,11 +36,15 @@ class Sensor extends React.Component {
 	}
 
 	onMouseEvent = ({clientX, clientY}) => {
-		const mouseX = clientX - this.sensorRect.getBoundingClientRect().left
-		const mouseY = clientY - this.sensorRect.getBoundingClientRect().top
-		const {x, points} = this.findPoint(mouseX)
+		const sensorRect = this.sensorRectRef.current
 
-		this.setState({mouseX, mouseY, x, points})
+		if (sensorRect) {
+			const mouseX = clientX - sensorRect.getBoundingClientRect().left
+			const mouseY = clientY - sensorRect.getBoundingClientRect().top
+			const {x, points} = this.findPoint(mouseX)
+	
+			this.setState({mouseX, mouseY, x, points})
+		}
 	}
 
 	render() {
@@ -51,7 +57,7 @@ class Sensor extends React.Component {
 				onMouseLeave={() => this.setState(initialState)}
 				style={{ pointerEvents: "all" }}
 			>
-				<rect ref={node => (this.sensorRect = node)}
+				<rect ref={this.sensorRectRef}
 					width={String(width)} height={String(height)}
 					style={{ fill: "none" }}
 				/>

@@ -36,6 +36,9 @@ class Tooltip extends React.Component {
 		),
 	}
 
+	tooltipRef = React.createRef()
+	tooltipBgRef = React.createRef()
+
 	padding = 10
 	textY = 9
 	lineCounts = 10
@@ -54,10 +57,10 @@ class Tooltip extends React.Component {
 		const xFormat = this.props.xFormat || ((x) => x)
 		const shouldRenderEtc = !!points.slice(this.lineCounts).length
 		return (
-			<StyledTooltipGroup innerRef={node => (this.tooltip = node)}
+			<StyledTooltipGroup ref={this.tooltipRef}
 				style={{ pointerEvents: "none" }}
 			>
-				<rect ref={node => (this.tooltipBg = node)}
+				<rect ref={this.tooltipBgRef}
 					rx="5" ry="5" fill="black" opacity="0.75"
 				/>
 				<text x={this.padding} y={this.padding + this.textY}>
@@ -101,33 +104,35 @@ class Tooltip extends React.Component {
 			mouseX, mouseY
 		} = this.props
 
-		const tooltip = this.tooltip
-		const tooltipBg = this.tooltipBg
-		const tooltipNames = tooltip.querySelectorAll(".name")
-		const tooltipValues = tooltip.querySelectorAll(".value")
+		const tooltip = this.tooltipRef.current
+		const tooltipBg = this.tooltipBgRef.current
 
-		tooltipBg.setAttribute("display", "none")
-		tooltipBg.setAttribute("width", 0)
-		tooltipBg.setAttribute("height", 0)
-		tooltipNames.forEach((node) => wrapText(node, 90))
-
-		const maxNameLength = Math.max(...[...tooltipNames].map((node) => node.getComputedTextLength()))
-		const maxValueLength = Math.max(...[...tooltipValues].map((node) => node.getComputedTextLength()))
-		this.maxValueX = Math.max((this.maxValueX || 0), 150, 13 + maxNameLength + 10 + maxValueLength)
-		tooltipValues.forEach((node) => node.setAttribute("x", this.maxValueX))
-
-		const {top, right, bottom, left} = tooltip.getBoundingClientRect()
-		const bgWidth = right - left + 20
-		const bgHeight = bottom - top + 20
-		tooltipBg.setAttribute("width", bgWidth)
-		tooltipBg.setAttribute("height", bgHeight)
-		tooltipBg.removeAttribute("display")
-
-		const tooltipX = mouseX + ((mouseX < (width + padding.left - padding.right) / 2) ? 20 : - 20 - bgWidth)
-		const tooltipY = Math.max(0, Math.min(mouseY - bgHeight / 2, height - bgHeight))
-		tooltip.setAttribute("transform", `translate(${tooltipX}, ${tooltipY})`)
+		if (tooltip && tooltipBg) {
+			const tooltipNames = tooltip.querySelectorAll(".name")
+			const tooltipValues = tooltip.querySelectorAll(".value")
+	
+			tooltipBg.setAttribute("display", "none")
+			tooltipBg.setAttribute("width", 0)
+			tooltipBg.setAttribute("height", 0)
+			tooltipNames.forEach((node) => wrapText(node, 90))
+	
+			const maxNameLength = Math.max(...[...tooltipNames].map((node) => node.getComputedTextLength()))
+			const maxValueLength = Math.max(...[...tooltipValues].map((node) => node.getComputedTextLength()))
+			this.maxValueX = Math.max((this.maxValueX || 0), 150, 13 + maxNameLength + 10 + maxValueLength)
+			tooltipValues.forEach((node) => node.setAttribute("x", this.maxValueX))
+	
+			const {top, right, bottom, left} = tooltip.getBoundingClientRect()
+			const bgWidth = right - left + 20
+			const bgHeight = bottom - top + 20
+			tooltipBg.setAttribute("width", bgWidth)
+			tooltipBg.setAttribute("height", bgHeight)
+			tooltipBg.removeAttribute("display")
+	
+			const tooltipX = mouseX + ((mouseX < (width + padding.left - padding.right) / 2) ? 20 : - 20 - bgWidth)
+			const tooltipY = Math.max(0, Math.min(mouseY - bgHeight / 2, height - bgHeight))
+			tooltip.setAttribute("transform", `translate(${tooltipX}, ${tooltipY})`)
+		}
 	}
-
 }
 
 function wrapText(node, maxTextLength) {
